@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForestBot", "ForestBot\ForestBot.csproj", "{CADA952B-B05C-4F9F-BEDE-415986677B6C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForestBot", "ForestBot\ForestBot.csproj", "{CADA952B-B05C-4F9F-BEDE-415986677B6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtopiaLib", "UtopiaLib\UtopiaLib.csproj", "{D4D9A700-1838-4649-84EE-81E8A3F11A11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtopiaLibTest", "UtopiaLibTest\UtopiaLibTest.csproj", "{24288F77-F0E6-4EED-8F9D-580CED8582EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{CADA952B-B05C-4F9F-BEDE-415986677B6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CADA952B-B05C-4F9F-BEDE-415986677B6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CADA952B-B05C-4F9F-BEDE-415986677B6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4D9A700-1838-4649-84EE-81E8A3F11A11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4D9A700-1838-4649-84EE-81E8A3F11A11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4D9A700-1838-4649-84EE-81E8A3F11A11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4D9A700-1838-4649-84EE-81E8A3F11A11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24288F77-F0E6-4EED-8F9D-580CED8582EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24288F77-F0E6-4EED-8F9D-580CED8582EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24288F77-F0E6-4EED-8F9D-580CED8582EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24288F77-F0E6-4EED-8F9D-580CED8582EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
