@@ -26,8 +26,8 @@ namespace UtopiaLib
             Day = 1 + (tickOfYear % 24);
             Tick = tick;
         }
-
-        public override string ToString() => MonthString() + Day + " Y" + Year;
+        
+        public override string ToString() => string.Format("{2}{0,3} Y{1}", Day, Year, MonthString());
 
         public string MonthString()
         {

@@ -41,7 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AgeSettings.cs" />
     <Compile Include="Tools\CeasefireTimeline.cs" />
+    <Compile Include="StrategySettings.cs" />
     <Compile Include="UtopiaDate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

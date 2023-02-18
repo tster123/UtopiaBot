@@ -11,7 +11,7 @@ namespace UtopiaLibTest
         [TestMethod]
         public void TestTimeline()
         {
-            CeasefireTimeline timeline = new CeasefireTimeline();
+            CeasefireTimeline timeline = new CeasefireTimeline(new AgeSettings(), new StrategySettings());
             var ret = timeline.GetTimeline(new UtopiaDate(0, 5, 17));
             foreach (var e in ret)
             {

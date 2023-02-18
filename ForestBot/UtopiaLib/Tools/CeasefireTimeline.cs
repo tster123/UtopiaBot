@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UtopiaLib.Tools
 {
@@ -21,34 +19,74 @@ namespace UtopiaLib.Tools
     }
     public class CeasefireTimeline
     {
-        private int ceasefireLength = 4 * 24;
-        private int stableCapacity = 80;
-        private double stableProduction = 2;
-        private double loveAndPeaceHorceSpeed = 1.4;
-        private double targetHorseFill = 0.9;
+        private readonly AgeSettings age;
+        private readonly StrategySettings strat;
 
-        private double baseBuildTime = 16,
-            buildersBoonSpeedup = 0.25,
-            expedientSavings = 0.2,
-            expectedExpedientStrength = 1.0,
-            averageConstructionScience = 0.03;
+        public CeasefireTimeline(AgeSettings age, StrategySettings strat)
+        {
+            this.age = age;
+            this.strat = strat;
+        }
 
         public List<TimelineEvent> GetTimeline(UtopiaDate warEndDate)
         {
             var ret = new List<TimelineEvent>();
-            ret.Add(new TimelineEvent(warEndDate, "War Ended"));
-            UtopiaDate cfEnd = warEndDate.AddTicks(ceasefireLength + 1);
-            ret.Add(new TimelineEvent(cfEnd, "Ceasefire Ends"));
+            ret.Add(new TimelineEvent(warEndDate, "War ended"));
+            UtopiaDate cfEnd = warEndDate.AddTicks(age.CeasefireLength + 1);
+            ret.Add(new TimelineEvent(cfEnd, "Ceasefire ends"));
 
-            int buildTime = (int)(baseBuildTime *
-                                  (1 - expectedExpedientStrength * expedientSavings) *
-                                  (1 - averageConstructionScience) *
-                                  (1 - buildersBoonSpeedup));
+            int buildTime = (int)(age.BaseBuildTime *
+                                  (1 - strat.ExpectedExpedientStrength * age.ExpedientBuildSpeedBonus) *
+                                  (1 - strat.AverageConstructionScience) *
+                                  (1 - age.BuildersBoonSpeedup));
 
-            double horsesNeeded = stableCapacity * targetHorseFill;
-            double ticksToFillStables = horsesNeeded / (stableProduction * loveAndPeaceHorceSpeed);
+            // stable build time
+            double horsesNeeded = age.StableCapacity * strat.TargetHorseFill;
+            double ticksToFillStables = horsesNeeded / (age.StableProduction * (1 + age.LoveAndPeaceHorseSpeedBonus));
             UtopiaDate buildStables = cfEnd.AddTicks(-1 * (buildTime + (int)Math.Round(ticksToFillStables)));
-            ret.Add(new TimelineEvent(buildStables, "Build Stables (BB + L&P)"));
+            ret.Add(new TimelineEvent(buildStables, "Build stables (BB + L&P)"));
+
+            ret.Add(new TimelineEvent(cfEnd.AddTicks(-buildTime), "Switch to war build"));
+            ret.Add(new TimelineEvent(cfEnd.AddTicks(-49), "Raise wages to 200%"));
+
+            // training date
+            int trainingTime = (int)Math.Ceiling(
+                age.BaseTrainingTime
+                * (1 - age.ExpedientTrainSpeedBonus * strat.ExpectedExpedientStrength)
+                * (1 - age.InspireArmyTrainingSpeedBonus)
+                * (1 - strat.AverageTrainingTimeScience));
+            UtopiaDate trainingDate = cfEnd.AddTicks(-trainingTime);
+            ret.Add(new TimelineEvent(trainingDate, $"Last date to start training (w/ IA  & {strat.AverageTrainingTimeScience:P} valor science)"));
+            ret.Add(new TimelineEvent(trainingDate.AddTicks(-buildTime), "Latest build 25-30% arms (w/ BB)"));
+
+            double draftSpeed = age.DraftEmergency
+                                * (1 + (age.ExpedientDraft * strat.ExpectedExpedientStrength))
+                                * (1 + age.PatriatismBonus);
+            int draftTime = 0;
+            double ppa = strat.AveragePeonsPerAcre;
+            while (ppa > strat.TargetPeonsPerAcre)
+            {
+                ppa *= (1 - draftSpeed);
+                draftTime++;
+            }
+
+            ret.Add(new TimelineEvent(trainingDate.AddTicks(-draftTime),
+                $"Start draft for full train from {strat.AveragePeonsPerAcre} PPA"));
+            UtopiaDate ritualPopDate = trainingDate.AddTicks(-draftTime - 2);
+            ret.Add(new TimelineEvent(ritualPopDate,
+                "Last date to activate Expedient"));
+
+            double runesNeededPerAcre = age.RitualCostPerAcre * (1 + strat.RitualBuffer) 
+                * strat.RitualCastsDesired / strat.RitualSuccessRate;
+            double runesPerTower = age.TowerProduction * (1 + strat.ProductionScience) * (1 + strat.ToolsScience);
+            int fastBuild = buildTime / 2;
+            int towerTicks = ritualPopDate.Tick - warEndDate.Tick - fastBuild;
+            runesPerTower *= towerTicks;
+            double towerPercentage = runesNeededPerAcre / runesPerTower;
+            ret.Add(new TimelineEvent(warEndDate,
+                "Build towers (BB, double speed) " +
+                $"(min {towerPercentage:P1} at {strat.ProductionScience:P1} prod, {strat.ToolsScience:P1} tools science)"));
+
             return ret.OrderBy(t => t.Date).ToList();
         }
     }
