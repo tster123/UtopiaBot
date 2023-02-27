@@ -5,9 +5,11 @@ VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForestBot", "ForestBot\ForestBot.csproj", "{CADA952B-B05C-4F9F-BEDE-415986677B6C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForestLib", "ForestLib\ForestLib.csproj", "{CA8DD847-7D8B-4F6D-B820-64EE94511099}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForestLib", "ForestLib\ForestLib.csproj", "{CA8DD847-7D8B-4F6D-B820-64EE94511099}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForestTests", "ForestTests\ForestTests.csproj", "{C28D6235-787B-479A-BF29-120329764093}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForestTests", "ForestTests\ForestTests.csproj", "{C28D6235-787B-479A-BF29-120329764093}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtopiaListener", "UtopiaListener\UtopiaListener.csproj", "{C08BDCFD-91A5-452C-B671-A395B589F05A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{C28D6235-787B-479A-BF29-120329764093}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C28D6235-787B-479A-BF29-120329764093}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C28D6235-787B-479A-BF29-120329764093}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C08BDCFD-91A5-452C-B671-A395B589F05A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C08BDCFD-91A5-452C-B671-A395B589F05A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C08BDCFD-91A5-452C-B671-A395B589F05A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C08BDCFD-91A5-452C-B671-A395B589F05A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
