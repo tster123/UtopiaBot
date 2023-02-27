@@ -58,16 +58,25 @@ namespace UtopiaListener
                     if (url.ToLower().EndsWith("/api/intel") &&
                         context.Request.Method.ToLower() == "post")
                     {
-                        string ret = "[{\"success\": true}]";
-                        var requestHeaders = context.Request.Headers.ToDictionary(h => h.Key, h => h.Value.First());
-                        intel.HandleRequest(requestHeaders, body);
-                        context.Response.ContentType = "application/json";
-                        //context.Response.Headers["Content-Type"] = 
-                        context.Response.ContentLength = Encoding.UTF8.GetBytes(ret).Length;
-                        context.Response.Body.Write(Encoding.UTF8.GetBytes(ret));
-                        //StreamWriter writer = new StreamWriter(context.Response.Body);
-                        //writer.Write(ret);
-                        return;
+                        try
+                        {
+                            string ret = "{\"success\": true}";
+                            var requestHeaders = context.Request.Headers.ToDictionary(h => h.Key, h => h.Value.First());
+                            intel.HandleRequest(requestHeaders, body);
+                            context.Response.ContentType = "text/plain";
+                            //context.Response.Headers["Content-Type"] = 
+                            context.Response.ContentLength = Encoding.UTF8.GetBytes(ret).Length;
+                            await context.Response.Body.WriteAsync(Encoding.UTF8.GetBytes(ret));
+                            //context.Response.Body.Flush();
+                            //context.Response.Body.Close();
+                            //StreamWriter writer = new StreamWriter(context.Response.Body);
+                            //writer.Write(ret);
+                            return;
+                        }
+                        catch (Exception e)
+                        {
+
+                        }
                     }
 
                     await next.Invoke();
