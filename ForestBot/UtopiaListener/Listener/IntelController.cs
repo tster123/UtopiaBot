@@ -31,7 +31,7 @@ namespace UtopiaListener.Listener
 
         // POST api/<IntelController>
         [HttpPost]
-        [Consumes("application/json")]
+        [Consumes("application/x-www-form-urlencoded; charset=UTF-8")]
         public void Post([FromBody] string value)
         {
             log.Info("POST: " + value);

@@ -1,13 +1,14 @@
 using System.Text;
 using Microsoft.AspNetCore.Http.Extensions;
 using NLog;
+using UtopiaListener.Listener;
 
 namespace UtopiaListener
 {
     public class Program
     {
         private static Logger log = LogManager.GetCurrentClassLogger();
-
+        private static IntelAccepter intel = new IntelAccepter();
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
@@ -50,7 +51,25 @@ namespace UtopiaListener
                     log.Info(url + "\nHEADERS:" + headers + "\nBODY:\n" + body);
                     Console.WriteLine(body);
                     context.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(body));
-                    
+                    context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+                    context.Response.Headers["Access-Control-Allow-Methods"] = "POST";
+                    context.Response.Headers["Access-Control-Max-Age"] = "1000";
+
+                    if (url.ToLower().EndsWith("/api/intel") &&
+                        context.Request.Method.ToLower() == "post")
+                    {
+                        string ret = "[{\"success\": true}]";
+                        var requestHeaders = context.Request.Headers.ToDictionary(h => h.Key, h => h.Value.First());
+                        intel.HandleRequest(requestHeaders, body);
+                        context.Response.ContentType = "application/json";
+                        //context.Response.Headers["Content-Type"] = 
+                        context.Response.ContentLength = Encoding.UTF8.GetBytes(ret).Length;
+                        context.Response.Body.Write(Encoding.UTF8.GetBytes(ret));
+                        //StreamWriter writer = new StreamWriter(context.Response.Body);
+                        //writer.Write(ret);
+                        return;
+                    }
+
                     await next.Invoke();
                     context.Request.Body = initialBody;
                 }
