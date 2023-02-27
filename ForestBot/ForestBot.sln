@@ -10,6 +10,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForestTests", "ForestTests\ForestTests.csproj", "{C28D6235-787B-479A-BF29-120329764093}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtopiaListener", "UtopiaListener\UtopiaListener.csproj", "{C08BDCFD-91A5-452C-B671-A395B589F05A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtopiaLib", "UtopiaLib\UtopiaLib.csproj", "{D4D9A700-1838-4649-84EE-81E8A3F11A11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtopiaLibTest", "UtopiaLibTest\UtopiaLibTest.csproj", "{24288F77-F0E6-4EED-8F9D-580CED8582EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +36,14 @@ Global
 		{C08BDCFD-91A5-452C-B671-A395B589F05A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C08BDCFD-91A5-452C-B671-A395B589F05A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C08BDCFD-91A5-452C-B671-A395B589F05A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4D9A700-1838-4649-84EE-81E8A3F11A11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4D9A700-1838-4649-84EE-81E8A3F11A11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4D9A700-1838-4649-84EE-81E8A3F11A11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4D9A700-1838-4649-84EE-81E8A3F11A11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24288F77-F0E6-4EED-8F9D-580CED8582EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24288F77-F0E6-4EED-8F9D-580CED8582EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24288F77-F0E6-4EED-8F9D-580CED8582EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24288F77-F0E6-4EED-8F9D-580CED8582EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
