@@ -3,18 +3,23 @@ using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Discord.Interactions;
+using ForestBot.Modules;
+using ForestLib;
 
 namespace ForestBot
 {
     public class Constants
     {
-        public const string Token = "OTE2Nzk0ODE0MzAzOTgxNjU5.GJq5SU.J2IB82ZQjWD9TYfoj3NAdV0AQWm4ys_8nBGS80";
+        
+        // To add to a server, go to this URL:
+        // https://discord.com/api/oauth2/authorize?client_id=916794814303981659&permissions=277025491008&scope=bot
     }
 
     public class Program
     {
         private readonly IConfiguration _configuration;
         private readonly IServiceProvider _services;
+        private readonly MessageHandler _messageHandler;
 
         private readonly DiscordSocketConfig _socketConfig = new()
         {
@@ -36,12 +41,15 @@ namespace ForestBot
                 .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
                 .AddSingleton<InteractionHandler>()
                 .BuildServiceProvider();
+            _messageHandler = new MessageHandler();
         }
 
         static void Main(string[] args)
-            => new Program().RunAsync()
+        {
+            new Program().RunAsync()
                 .GetAwaiter()
                 .GetResult();
+        }
 
         public async Task RunAsync()
         {
@@ -53,13 +61,17 @@ namespace ForestBot
             await _services.GetRequiredService<InteractionHandler>()
                 .InitializeAsync();
 
+            client.MessageReceived += _messageHandler.MessageReceivedEvent;
+
             // Bot token can be provided from the Configuration object we set up earlier
-            await client.LoginAsync(TokenType.Bot, Constants.Token);
+            await client.LoginAsync(TokenType.Bot, Settings.Instance.DiscordToken);
             await client.StartAsync();
 
             // Never quit the program until manually forced to.
             await Task.Delay(Timeout.Infinite);
         }
+
+        
 
         private async Task LogAsync(LogMessage message)
             => Console.WriteLine(message.ToString());
