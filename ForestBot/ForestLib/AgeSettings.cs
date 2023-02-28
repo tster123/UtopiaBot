@@ -1,4 +1,4 @@
-﻿namespace UtopiaLib
+﻿namespace ForestLib
 {
     public class AgeSettings
     {

@@ -61,7 +61,7 @@ namespace UtopiaListener
                         try
                         {
                             string ret = "{\"success\": true}";
-                            var requestHeaders = context.Request.Headers.ToDictionary(h => h.Key, h => h.Value.First());
+                            var requestHeaders = context.Request.Headers.ToDictionary(h => h.Key, h => h.Value.First() ?? "");
                             intel.HandleRequest(requestHeaders, body);
                             context.Response.ContentType = "text/plain";
                             //context.Response.Headers["Content-Type"] = 
@@ -73,7 +73,7 @@ namespace UtopiaListener
                             //writer.Write(ret);
                             return;
                         }
-                        catch (Exception e)
+                        catch (Exception)
                         {
 
                         }

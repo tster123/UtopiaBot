@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NLog;
-using NLog.Fluent;
-using NLog.Web;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

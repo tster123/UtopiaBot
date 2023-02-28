@@ -3,7 +3,7 @@
     [TestClass]
     public class UnitTest1
     {
-        string ops = @"
+        readonly string ops = @"
 ☄️💚 Gamegear gamegea#  <<fireball | 99 German NoNo 99 (5:12)>> 310|17% guilds (72% BE|1.02 (m.1.55)) vs 0.72 (m.0.76)|rNW 0.93| total 6107 (0.05)
 
 ☄️💚 B A Start b a star#  <<drought | 99 n00bs (5:12)>> 16|19.7% guilds (93% BE|0.87 (m.1.11))|rNW 0.84
@@ -35,6 +35,7 @@
         [TestMethod]
         public void TestMethod1()
         {
+            Assert.IsNotNull(ops);
         }
     }
 

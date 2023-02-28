@@ -1,8 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using UtopiaLib;
+﻿using ForestLib;
 
-namespace UtopiaLibTest
+namespace ForestTests
 {
     [TestClass]
     public class UtopiaDateTest

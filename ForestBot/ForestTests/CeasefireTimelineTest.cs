@@ -1,9 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using UtopiaLib;
-using UtopiaLib.Tools;
+﻿using ForestLib;
+using ForestLib.Tools;
 
-namespace UtopiaLibTest
+namespace ForestTests
 {
     [TestClass]
     public class CeasefireTimelineTest

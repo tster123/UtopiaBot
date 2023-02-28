@@ -1,11 +1,8 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using ForestBot;
 using Microsoft.Extensions.Configuration;
-using System;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace ForestBot
 {

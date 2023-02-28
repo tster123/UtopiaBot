@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using Discord;
+﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 

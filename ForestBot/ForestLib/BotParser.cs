@@ -10,7 +10,7 @@
     public class Action
     {
         public ActionType Type;
-        public string OpName;
+        public string? OpName;
         public bool Success;
         public int Damage;
         public int ThievesLost;

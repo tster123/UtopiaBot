@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace UtopiaLib
+﻿namespace ForestLib
 {
     public class UtopiaDate : IComparable<UtopiaDate>
     {
@@ -39,7 +37,7 @@ namespace UtopiaLib
 
         public UtopiaDate AddTicks(int ticks) => new UtopiaDate(Tick + ticks);
 
-        public int CompareTo(UtopiaDate other)
+        public int CompareTo(UtopiaDate? other)
         {
             if (ReferenceEquals(this, other)) return 0;
             if (ReferenceEquals(null, other)) return 1;
@@ -51,11 +49,11 @@ namespace UtopiaLib
             return Tick == other.Tick;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((UtopiaDate)obj);
         }
 
