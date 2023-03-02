@@ -10,6 +10,7 @@ namespace ForestLib.Database
     public class ForestContext : DbContext
     {
         public DbSet<RawMessage> RawMessages { get; set; }
+        public DbSet<TmOperation> Operations { get; set; }
 
         // The following configures EF to create a Sqlite database file in the
         // special "local" folder for your platform.

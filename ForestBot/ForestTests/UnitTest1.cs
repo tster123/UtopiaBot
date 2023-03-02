@@ -1,41 +1,84 @@
-﻿namespace ForestTests
+﻿using ForestLib;
+using ForestLib.Database;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+
+namespace ForestTests
 {
     [TestClass]
     public class UnitTest1
     {
         readonly string ops = @"
-☄️💚 Gamegear gamegea#  <<fireball | 99 German NoNo 99 (5:12)>> 310|17% guilds (72% BE|1.02 (m.1.55)) vs 0.72 (m.0.76)|rNW 0.93| total 6107 (0.05)
-
-☄️💚 B A Start b a star#  <<drought | 99 n00bs (5:12)>> 16|19.7% guilds (93% BE|0.87 (m.1.11))|rNW 0.84
-
-
-🌟💔 WTF is a gamecube wtf is a gamecub#  <<minor protection>> FAIL | 10.5% guilds (74% BE (m.7.8))
-🌟💚 PS Vita ps vit#  <<magic shield>> 19 | 18.2% guilds (62% BE (m.11.3))
-🌟💚 Gamegear gamegea#  <<ghost workers>> 14 | 17% guilds (70% BE (m.11.9))
-🌟💚 AllYourBaseAreBelongToUs allyourbasearebelongtou#  <<magic shield>> 13 | 9.9% guilds (60% BE (m.5.9))
-
-🕵️💚 PS Vita ps vit#  <<spy on military | 99 Road Apples (5:12)>>|217 sent (0.46)|4.63 (m.5.75)|rNW 1.01
-🕵️💔 Duck Hunt duck hun#  <<survey | 99 problems (5:12)>> FAIL (-9 thieves)|190 sent (0.31)|3.17 (m.3.72) vs 2.5 (m.2.65)|rNW 0.92
-
-
-🕵️💚 Gamegear gamegea#  <<propaganda elites | 99 n00bs (5:12)>> 14|3570 sent (6.41)|6.42 (m.14.71) vs 0.66 (m.0.67)|rNW 1.02
-🕵️💚 Gamegear gamegea#  <<propaganda thieves | 99 n00bs (5:12)>> 29|3570 sent (6.41)|6.42 (m.14.71) vs 0.66 (m.0.67)|rNW 1.02
-🕵️💔 B A Start b a star#  <<rob the granaries | 99 n00bs (5:12)>> FAIL (- thieves)|25 sent (0.04)|3.33 (m.3.85) vs 0.7 (m.0.71)|rNW 0.84
-🕵️💚  up up down down Up Up Down Down <<night strike | 99 n00bs (5:12)>> 8|214 sent (0.28)|2.8 (m.3.21) vs 0.62 (m.0.63)|rNW 1.27
-🕵️💔 B A Start b a star#  <<rob the granaries | 99 n00bs (5:12)>> FAIL (- thieves)|25 sent (0.04)|3.33 (m.3.85) vs 0.7 (m.0.71)|rNW 0.84
-
-
-:crossed_swords: left right left right [left right left righ#] attacked 99 Red Balloons (5:12)|captured: 66|loss: 89 Swordsmen, 62 Knights and 151 horses|kills: 110 (+64 prisoners)|return: 13.09|217 spec creds|218 OS promoted|58536off (1 gens)
-:crossed_swords: I ate my kids candy [i ate my kids cand#] attacked Ultra Super Knight of Erin (5:9)|captured: 61|loss: 33 Griffins|kills: 19 (+35 prisoners)|return: 8.93|47 spec creds|118 OS promoted|141 peasants|13903off (1 gens)
-:crossed_swords: Licks banana at store [licks banana at stor#] attacked Barium Buttocks (4:8)|learn: 186,964 |loss: 88 Goblins, 520 Ogres and 609 horses|kills: 534 (+150 prisoners)|return: 16.26|261620off (1 gens)
-:crossed_swords: gave trick-or-treaters ex-lax [gave trick-or-treaters ex-la#] attacked No White Flag (6:2)|razed: 129|loss: 225 Night Rangers and 225 horses|kills: 71 (+131 prisoners)|return: 10.77|60395off (1 gens)
-:crossed_swords: I let kingy think I care [i let kingy think i car#] attacked Fury Phoenix (3:2)|recaptured: 105|loss: 399 Rangers, 85 Elf Lords and 461 horses|kills: 632|return: 12.00|84742off (1 gens)
-:crossed_swords: Called out on first day [called out on first da#] attacked Pandemonium Knight of Erin (5:9)|killed: 777 peasants, thieves, and wizards|loss: 84 Night Rangers, 12 Drows and 96 horses|kills: 12 (+27 prisoners)|return: 11.90|22357off (2 gens)
+???? Welcome to Jurassic Park welcome to jurassic par#  <<__natures blessing__>> __FAIL__ | 10% guilds (99% BE (m.9.9))
+???? Welcome to Jurassic Park welcome to jurassic par#  <<__natures blessing__>> **14** | 10% guilds (99% BE (m.9.9))
+???? Welcome to Jurassic Park welcome to jurassic par#  <<__natures blessing__>> __FAIL__ | 10% guilds (99% BE (m.9.9))
+???? if you know a UNIX system if you know a unix syste#  <<__sloth__ **| Death Note (3:10)**>> __FAIL__ (-3 wizards)|22% guilds (98% BE|2 (m.2.6))|rNW 1.11
+???? if you know a UNIX system if you know a unix syste#  <<__sloth__ **| Death Note (3:10)**>> **5**|22% guilds (98% BE|2 (m.2.6))|rNW 1.11
+????? Welcome to Jurassic Park welcome to jurassic par#  <<__rob the towers__ **| Shirakawa Kaede (2:9)**>> __FAIL__ (-2 thieves)|42 sent (0.1)|1.74 (m.1.74)|rNW 0.95
+????? Troodon troodo#  <<__rob the towers__ **| Twin Peak Mountains (2:9)**>> __FAIL__ (- thieves)|55 sent (0.13)|1.87 (m.1.87)|rNW 1.27
+????? Welcome to Jurassic Park welcome to jurassic par#  <<__rob the towers__ **| Lebron (2:9)**>> **285**|42 sent (0.1)|1.74 (m.1.74)|rNW 1.47
+????? Welcome to Jurassic Park welcome to jurassic par#  <<__rob the towers__ **| RedHead Afuro Samurai (2:9)**>> __FAIL__ (-2 thieves)|79 sent (0.19)|1.74 (m.1.74)|rNW 0.97
+????? Welcome to Jurassic Park welcome to jurassic par#  <<__rob the towers__ **| waggy (2:9)**>> __FAIL__ (-4 thieves)|91 sent (0.22)|1.74 (m.1.74)|rNW 1
+????? BRONTY THE BRONTOSAURUS bronty the brontosauru#  <<__spy on throne__ **| MJ Touched No One (1:9)**>>|63 sent (0.15)|1.49 (m.1.49)|rNW 1.02
+???? Spinosaurus spinosauru#  <<__builders boon__>> **23** | 19.5% guilds (99% BE (m.38.6))
+????? Welcome to Jurassic Park welcome to jurassic par#  <<__rob the towers__ **| waggy (2:9)**>> **314**|91 sent (0.22)|1.74 (m.1.74)|rNW 1
+????? BRONTY THE BRONTOSAURUS bronty the brontosauru#  <<__spy on throne__ **| Facebook the PsyOp Launches (1:9)**>>|63 sent (0.15)|1.49 (m.1.49)|rNW 1.01
+????? BRONTY THE BRONTOSAURUS bronty the brontosauru#  <<__rob the towers__ **| Facebook the PsyOp Launches (1:9)**>> **1236**|163 sent (0.39)|1.49 (m.1.49)|rNW 1.01
+????? BRONTY THE BRONTOSAURUS bronty the brontosauru#  <<__rob the towers__ **| Facebook the PsyOp Launches (1:9)**>> __FAIL__ (-6 thieves)|163 sent (0.39)|1.49 (m.1.49)|rNW 1.01
+????? Sharp Tooth sharp toot#  <<__spy on throne__ **| waggy (2:9)**>>|10 sent (0.02)|1.73 (m.1.73)|rNW 0.89
+????? Barney the purple dinosaur barney the purple dinosau#  <<__rob the towers__ **| Tsatthoghua (2:9)**>> __FAIL__ (-5 thieves)|137 sent (0.33)|1.9 (m.2.33)|rNW 0.91
+????? Sharp Tooth sharp toot#  <<__spy on throne__ **| Shirakawa Kaede (2:9)**>>|10 sent (0.02)|1.73 (m.1.73)|rNW 1.1
+????? Barney the purple dinosaur barney the purple dinosau#  <<__rob the towers__ **| Tsatthoghua (2:9)**>> __FAIL__ (-3 thieves)|137 sent (0.33)|1.9 (m.2.33)|rNW 0.91
+????? Barney the purple dinosaur barney the purple dinosau#  <<__rob the towers__ **| Tsatthoghua (2:9)**>> **644**|137 sent (0.33)|1.9 (m.2.33)|rNW 0.91
+????? Sharp Tooth sharp toot#  <<__spy on throne__ **| RedHead Afuro Samurai (2:9)**>>|10 sent (0.02)|1.73 (m.1.73)|rNW 1.19
+????? Barney the purple dinosaur barney the purple dinosau#  <<__rob the towers__ **| RedHead Afuro Samurai (2:9)**>> __FAIL__ (-6 thieves)|137 sent (0.33)|1.9 (m.2.33)|rNW 1.24
+????? Barney the purple dinosaur barney the purple dinosau#  <<__rob the towers__ **| RedHead Afuro Samurai (2:9)**>> **1247**|137 sent (0.33)|1.9 (m.2.33)|rNW 1.24
+????? Barney the purple dinosaur barney the purple dinosau#  <<__rob the towers__ **| RedHead Afuro Samurai (2:9)**>> **362**|137 sent (0.33)|1.9 (m.2.33)|rNW 1.24
+????? Sharp Tooth sharp toot#  <<__rob the towers__ **| RedHead Afuro Samurai (2:9)**>> **276**|36 sent (0.09)|1.73 (m.1.73)|rNW 1.19
+????? Sharp Tooth sharp toot#  <<__rob the towers__ **| RedHead Afuro Samurai (2:9)**>> **216**|26 sent (0.06)|1.73 (m.1.73)|rNW 1.19
+????? Sharp Tooth sharp toot#  <<__spy on throne__ **| Ghost Rider (2:9)**>>|10 sent (0.02)|1.73 (m.1.73)|rNW 1.19
+????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> __FAIL__ (-2 thieves)|65 sent (0.15)|1.73 (m.1.73)|rNW 1.19
+????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> **514**|65 sent (0.15)|1.73 (m.1.73)|rNW 1.19
+????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> **440**|57 sent (0.14)|1.73 (m.1.73)|rNW 1.19
+????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> **376**|51 sent (0.12)|1.73 (m.1.73)|rNW 1.19
+????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> __FAIL__ (-2 thieves)|45 sent (0.11)|1.73 (m.1.73)|rNW 1.19
+????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> **321**|45 sent (0.11)|1.73 (m.1.73)|rNW 1.06
+????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> **274**|40 sent (0.1)|1.73 (m.1.73)|rNW 1.06
 ";
         [TestMethod]
         public void TestMethod1()
         {
             Assert.IsNotNull(ops);
+        }
+
+
+        [TestMethod]
+        public void DatabaseLoader()
+        {
+            ForestContext db = new ForestContext();
+            var messages = db.RawMessages.Where(m => m.ChannelName == "bot-ops" && m.Source == "Bot").ToList();
+            var parsedMessages = db.Operations.Select(o => o.ParsedFromMessageId).Distinct().ToHashSet();
+            BotParser parser = new BotParser();
+            foreach (var m in messages)
+            {
+                try
+                {
+                    if (parsedMessages.Contains(m.Id))
+                    {
+                        continue;
+                    }
+                    var ops = parser.ParseOps(m.Timestamp, m.GuildId ?? 0, m.Id, m.MessageContent);
+                    foreach (var op in ops)
+                    {
+                        db.Operations.Add(op);
+                    }
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+                
+            }
         }
     }
 

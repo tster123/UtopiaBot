@@ -11,9 +11,9 @@ namespace ForestBot.Modules
         {
             RawMessage message = new RawMessage
             {
-                Id = arg.Id,
-                Author = arg.Id,
-                ChannelId = arg.Channel.Id,
+                Id = (long) arg.Id,
+                Author = (long)arg.Id,
+                ChannelId = (long)arg.Channel.Id,
                 ChannelName = arg.Channel.Name,
                 MessageContent = arg.Content,
                 Source = arg.Source.ToString(),
@@ -22,7 +22,7 @@ namespace ForestBot.Modules
             if (arg.Channel is IGuildChannel c)
             {
                 message.GuildName = c.Guild.Name;
-                message.GuildId = c.Guild.Id;
+                message.GuildId = (long)c.Guild.Id;
             }
 
             try
