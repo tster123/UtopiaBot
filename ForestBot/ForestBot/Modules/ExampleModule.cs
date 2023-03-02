@@ -66,6 +66,39 @@ namespace ForestBot.Modules
         public async Task Echo(string echo, [Summary(description: "mention the user")] bool mention = false)
             => await RespondAsync(echo + (mention ? Context.User.Mention : string.Empty));
 
+        [SlashCommand("process-messages", "Reads messages from another channel")]
+        public async Task ProcessMessage(string channel, int lookback = 100, int numMessages = 0, ulong startFromMessageId = 0)
+        {
+            SocketTextChannel? chan = Context.Guild.TextChannels.FirstOrDefault(c => c.Name.ToLower() == channel);
+            if (chan == null)
+            {
+                await RespondAsync($"Unable to find channel [{channel}]");
+                return;
+            }
+            IEnumerable<IMessage> messages;
+            if (startFromMessageId == 0)
+            {
+                messages = await chan.GetMessagesAsync(lookback).FlattenAsync();
+            }
+            else
+            {
+                messages = await chan.GetMessagesAsync(startFromMessageId, Direction.Before, lookback).FlattenAsync();
+            }
+            string message = "";
+            MessageHandler handler = new MessageHandler();
+            if (numMessages == 0) numMessages = int.MaxValue;
+            int processed = 0, saved = 0;
+            foreach (IMessage m in messages)
+            {
+                saved += await handler.MessageReceivedEvent(m);
+                processed++;
+                numMessages--;
+                if (numMessages <= 0) break;
+            }
+
+            await RespondAsync($"Processed {processed} messages, added {saved} to the DB");
+        }
+
         [SlashCommand("read-messages", "Reads messages from another channel")]
         public async Task ReadMessage(string channel)
         {

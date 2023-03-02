@@ -1,12 +1,13 @@
 ﻿using Discord.WebSocket;
 using Discord;
 using ForestLib.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace ForestBot.Modules
 {
     public class MessageHandler
     {
-        public async Task MessageReceivedEvent(SocketMessage arg)
+        public async Task<int> MessageReceivedEvent(IMessage arg)
         {
             RawMessage message = new RawMessage
             {
@@ -18,7 +19,7 @@ namespace ForestBot.Modules
                 Source = arg.Source.ToString(),
                 Timestamp = arg.Timestamp.UtcDateTime,
             };
-            if (arg.Channel is SocketGuildChannel c)
+            if (arg.Channel is IGuildChannel c)
             {
                 message.GuildName = c.Guild.Name;
                 message.GuildId = c.Guild.Id;
@@ -27,14 +28,20 @@ namespace ForestBot.Modules
             try
             {
                 ForestContext context = new ForestContext();
-                await context.RawMessages.AddAsync(message);
-                await context.SaveChangesAsync();
+                if (await context.RawMessages.CountAsync(m => m.Id == message.Id) == 0)
+                {
+                    await context.RawMessages.AddAsync(message);
+                    await context.SaveChangesAsync();
+                    return 1;
+                }
+
+                return 0;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                throw;
             }
-            
         }
     }
 }
