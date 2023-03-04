@@ -1,5 +1,4 @@
-﻿using Discord.WebSocket;
-using Discord;
+﻿using Discord;
 using ForestLib;
 using ForestLib.Database;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +7,7 @@ namespace ForestBot.Modules
 {
     public class MessageHandler
     {
-        public BotParser parser = new BotParser();
+        public BotParser Parser = new();
 
         public async Task<int> MessageReceivedEvent(IMessage arg)
         {
@@ -36,10 +35,18 @@ namespace ForestBot.Modules
                     await context.RawMessages.AddAsync(message);
                     if (message.ChannelName == "bot-ops" && message.Source == "Bot")
                     {
-                        var ops = parser.ParseOps(message.Timestamp, message.GuildId ?? 0, message.Id, message.MessageContent);
+                        var ops = Parser.ParseOps(message.Timestamp, message.GuildId ?? 0, message.Id, message.MessageContent);
                         foreach (var op in ops)
                         {
                             await context.Operations.AddAsync(op);
+                        }
+                    }
+                    if (message.ChannelName == "bot-attacks" && message.Source == "Bot")
+                    {
+                        var attacks = Parser.ParseAttacks(message.Timestamp, message.GuildId ?? 0, message.Id, message.MessageContent);
+                        foreach (var attack in attacks)
+                        {
+                            await context.Attacks.AddAsync(attack);
                         }
                     }
 
