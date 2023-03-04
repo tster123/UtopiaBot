@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace ForestLib.Database
 {
@@ -11,6 +6,7 @@ namespace ForestLib.Database
     {
         public DbSet<RawMessage> RawMessages { get; set; }
         public DbSet<TmOperation> Operations { get; set; }
+        public DbSet<Attack> Attacks { get; set; }
 
         // The following configures EF to create a Sqlite database file in the
         // special "local" folder for your platform.

@@ -2,13 +2,13 @@
 using ForestLib.Database;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
-namespace ForestTests
+namespace ForestTests.ParsingTests
 {
     [TestClass]
-    public class UnitTest1
+    public class TestOpParsing
     {
-        readonly string ops = @"
-???? Welcome to Jurassic Park welcome to jurassic par#  <<__natures blessing__>> __FAIL__ | 10% guilds (99% BE (m.9.9))
+        readonly string ops =
+            @"???? Welcome to Jurassic Park welcome to jurassic par#  <<__natures blessing__>> __FAIL__ | 10% guilds (99% BE (m.9.9))
 ???? Welcome to Jurassic Park welcome to jurassic par#  <<__natures blessing__>> **14** | 10% guilds (99% BE (m.9.9))
 ???? Welcome to Jurassic Park welcome to jurassic par#  <<__natures blessing__>> __FAIL__ | 10% guilds (99% BE (m.9.9))
 ???? if you know a UNIX system if you know a unix syste#  <<__sloth__ **| Death Note (3:10)**>> __FAIL__ (-3 wizards)|22% guilds (98% BE|2 (m.2.6))|rNW 1.11
@@ -36,23 +36,20 @@ namespace ForestTests
 ????? Sharp Tooth sharp toot#  <<__rob the towers__ **| RedHead Afuro Samurai (2:9)**>> **276**|36 sent (0.09)|1.73 (m.1.73)|rNW 1.19
 ????? Sharp Tooth sharp toot#  <<__rob the towers__ **| RedHead Afuro Samurai (2:9)**>> **216**|26 sent (0.06)|1.73 (m.1.73)|rNW 1.19
 ????? Sharp Tooth sharp toot#  <<__spy on throne__ **| Ghost Rider (2:9)**>>|10 sent (0.02)|1.73 (m.1.73)|rNW 1.19
-????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> __FAIL__ (-2 thieves)|65 sent (0.15)|1.73 (m.1.73)|rNW 1.19
-????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> **514**|65 sent (0.15)|1.73 (m.1.73)|rNW 1.19
-????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> **440**|57 sent (0.14)|1.73 (m.1.73)|rNW 1.19
-????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> **376**|51 sent (0.12)|1.73 (m.1.73)|rNW 1.19
 ????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> __FAIL__ (-2 thieves)|45 sent (0.11)|1.73 (m.1.73)|rNW 1.19
-????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> **321**|45 sent (0.11)|1.73 (m.1.73)|rNW 1.06
-????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> **274**|40 sent (0.1)|1.73 (m.1.73)|rNW 1.06
-";
+????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> **321**|45 sent (0.11)|1.73 (m.1.73)|rNW 1.06";
+
         [TestMethod]
-        public void TestMethod1()
+        public void TestParse()
         {
-            Assert.IsNotNull(ops);
+            BotParser parser = new BotParser();
+            var ret = parser.ParseOps(DateTime.UtcNow, 123L, 456L, ops);
+            Assert.AreEqual("Welcome to Jurassic Park", ret[0].SourceProvince);
         }
 
 
         [TestMethod]
-        public void DatabaseLoader()
+        public void DatabaseLoader_Operations()
         {
             ForestContext db = new ForestContext();
             var messages = db.RawMessages.Where(m => m.ChannelName == "bot-ops" && m.Source == "Bot").ToList();
@@ -66,21 +63,21 @@ namespace ForestTests
                     {
                         continue;
                     }
+
                     var ops = parser.ParseOps(m.Timestamp, m.GuildId ?? 0, m.Id, m.MessageContent);
                     foreach (var op in ops)
                     {
                         db.Operations.Add(op);
                     }
+
                     db.SaveChanges();
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
-                
+
             }
         }
     }
-
-   
 }

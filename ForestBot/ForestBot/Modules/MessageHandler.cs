@@ -34,11 +34,13 @@ namespace ForestBot.Modules
                 if (await context.RawMessages.CountAsync(m => m.Id == message.Id) == 0)
                 {
                     await context.RawMessages.AddAsync(message);
-
-                    var ops = parser.ParseOps(message.Timestamp, message.GuildId ?? 0, message.Id, message.MessageContent);
-                    foreach (var op in ops)
+                    if (message.ChannelName == "bot-ops" && message.Source == "Bot")
                     {
-                        await context.Operations.AddAsync(op);
+                        var ops = parser.ParseOps(message.Timestamp, message.GuildId ?? 0, message.Id, message.MessageContent);
+                        foreach (var op in ops)
+                        {
+                            await context.Operations.AddAsync(op);
+                        }
                     }
 
                     await context.SaveChangesAsync();

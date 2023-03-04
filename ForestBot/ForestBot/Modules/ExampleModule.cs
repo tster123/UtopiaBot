@@ -47,7 +47,7 @@ namespace ForestBot.Modules
     public class ExampleModule : InteractionModuleBase<SocketInteractionContext>
     {
         // Dependencies can be accessed through Property injection, public properties with public setters will be set by the service provider
-        public InteractionService Commands { get; set; }
+        public InteractionService? Commands { get; set; }
 
         private InteractionHandler _handler;
 
@@ -84,7 +84,6 @@ namespace ForestBot.Modules
             {
                 messages = await chan.GetMessagesAsync(startFromMessageId, Direction.Before, lookback).FlattenAsync();
             }
-            string message = "";
             MessageHandler handler = new MessageHandler();
             if (numMessages == 0) numMessages = int.MaxValue;
             int processed = 0, saved = 0;
