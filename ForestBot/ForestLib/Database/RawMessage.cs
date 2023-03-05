@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+﻿#pragma warning disable CS8618
 
 namespace ForestLib.Database
 {
@@ -18,5 +13,10 @@ namespace ForestLib.Database
         public long ChannelId { get; set; }
         public string? GuildName { get; set; }
         public long? GuildId { get; set; }
+
+        public override string ToString()
+        {
+            return $"{nameof(Timestamp)}: {Timestamp}, {nameof(ChannelName)}: {ChannelName}, {nameof(MessageContent)}: {MessageContent}";
+        }
     }
 }

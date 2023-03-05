@@ -1,4 +1,5 @@
 ﻿
+#pragma warning disable CS8618
 namespace ForestLib.Database
 {
     public class TmOperation
