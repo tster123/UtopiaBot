@@ -7,10 +7,6 @@ using System.Threading.Tasks;
 
 namespace ForestLib.State
 {
-    public enum Race
-    {
-        Human, Orc, Halfling, Undead, Faery, Dwarf, Elf, Avian
-    }
 
     public enum Personality
     {
