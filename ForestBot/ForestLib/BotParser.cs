@@ -87,6 +87,8 @@ namespace ForestLib
             return ops;
         }
 
+
+
         public string? Nullify(string v) => v.Trim() == "" ? null : v;
         public int? Intify(string? v) => v == null ? null : int.Parse(v);
     }
