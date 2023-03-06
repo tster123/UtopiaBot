@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace ForestLib.State
 {
+    public enum DraftRate
+    {
+        None, Reserve, Normal, Aggressive, Emergency
+    }
 
     public class ProvinceState
     {
@@ -15,6 +19,8 @@ namespace ForestLib.State
         public int Acres;
         public int Honor;
         public int Peasants;
+        public double MaxDraft;
+        public DraftRate DraftRate;
         public double BuildingEffectiveness;
         public int Money;
         public int Food;
@@ -73,6 +79,29 @@ namespace ForestLib.State
             Libraries,
             Stables,
             Dungeons;
+
+        public void Add(Buildings other)
+        {
+            Barren += other.Barren;
+            Homes += other.Homes;
+            Farms += other.Farms;
+            Mills += other.Mills;
+            Banks += other.Banks;
+            TrainingGrounds += other.TrainingGrounds;
+            Armouries += other.Armouries;
+            Barracks += other.Barracks;
+            Forts += other.Forts;
+            GuardStations += other.GuardStations;
+            Hospitals += other.Hospitals;
+            Guilds += other.Guilds;
+            Towers += other.Towers;
+            ThievesDns += other.ThievesDns;
+            WatchTowers += other.WatchTowers;
+            Universities += other.Universities;
+            Libraries += other.Libraries;
+            Stables += other.Stables;
+            Dungeons += other.Dungeons;
+        }
     }
 
 

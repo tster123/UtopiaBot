@@ -138,35 +138,37 @@ namespace ForestLib
 
     public class BuildingEffects
     {
-        public BuildingEffectCapacity BarrenCapacity = new BuildingEffectCapacity("Barren population", -1);
-        public BuildingEffectFlat BarrenFood = new BuildingEffectFlat("Barren Food", 2, false);
-        public BuildingEffectCapacity HomeCapacity = new BuildingEffectCapacity("Home", 10);
-        public BuildingEffectFlat HomeGrowth = new BuildingEffectFlat("Home peon growth", 0.5, false);
-        public BuildingEffectFlat Farm = new BuildingEffectFlat("Farm", 60);
-        public BuildingEffectPercentage MillConstruction = new BuildingEffectPercentage("Mill Construction", 0.04);
-        public BuildingEffectPercentage MillExploreGold = new BuildingEffectPercentage("Mill Explore Gold", 0.03);
-        public BuildingEffectPercentage MillExploreSold = new BuildingEffectPercentage("Mill Explore SOld", 0.02);
-        public BuildingEffectPercentage BankPercentage = new BuildingEffectPercentage("Bank percentage", 0.015);
-        public BuildingEffectFlat BankFlat = new BuildingEffectFlat("Farm flat", 25);
-        public BuildingEffectPercentage TrainingGroundOme = new BuildingEffectPercentage("Training Ground OME", 0.015);
-        public BuildingEffectPercentage TrainingGroundMerc = new BuildingEffectPercentage("Training Ground Merc", 0.02);
-        public BuildingEffectPercentage ArmouryWage = new BuildingEffectPercentage("Armoury wage", 0.02);
-        public BuildingEffectPercentage ArmouryDraftCost = new BuildingEffectPercentage("Armoury draft", 0.02);
-        public BuildingEffectPercentage ArmouryTrainingCost = new BuildingEffectPercentage("Armoury training", 0.015);
-        public BuildingEffectPercentage Barracks = new BuildingEffectPercentage("Barracks", 0.015);
-        public BuildingEffectPercentage Fort = new BuildingEffectPercentage("Fort", 0.015);
-        public BuildingEffectPercentage GuardStation = new BuildingEffectPercentage("Guard Station", 0.015);
-        public BuildingEffectPercentage HospitalCasualties = new BuildingEffectPercentage("Hospital casualties", 0.03);
-        public BuildingEffectPercentage HospitalPlague = new BuildingEffectPercentage("Hospital plague", 0.03);
-        public BuildingEffectPercentage ThievesDenLosses = new BuildingEffectPercentage("Thieves Den losses", 0.04, 0.95);
-        public BuildingEffectPercentage ThievesDenTpa = new BuildingEffectPercentage("Thieves Den TPA", 0.03);
-        public BuildingEffectPercentage WatchTowerCatch = new BuildingEffectPercentage("Watch Tower catch", 0.015);
-        public BuildingEffectPercentage WatchTowerDamage = new BuildingEffectPercentage("Watch Tower", 0.025);
-        public BuildingEffectPercentage UniversityScientistsSpawn = new BuildingEffectPercentage("University scientist spawn", 0.02, false);
-        public BuildingEffectPercentage UniversityScience = new BuildingEffectPercentage("University science", 0.01, false);
-        public BuildingEffectPercentage Library = new BuildingEffectPercentage("Library", 0.01, false);
-        public BuildingEffectCapacity StableCapacity = new BuildingEffectCapacity("Stable Capacity", 80);
-        public BuildingEffectFlat StableProduction = new BuildingEffectFlat("Stable Production", 2);
-        public BuildingEffectCapacity Dungeon = new BuildingEffectCapacity("Dungeon", 30);
+        public BuildingEffectCapacity BarrenCapacity = new("Barren population", -1);
+        public BuildingEffectFlat BarrenFood = new("Barren Food", 2, false);
+        public BuildingEffectCapacity HomeCapacity = new("Home", 10);
+        public BuildingEffectFlat HomeGrowth = new("Home peon growth", 0.5, false);
+        public BuildingEffectFlat Farm = new("Farm", 60);
+        public BuildingEffectPercentage MillConstruction = new("Mill Construction", 0.04);
+        public BuildingEffectPercentage MillExploreGold = new("Mill Explore Gold", 0.03);
+        public BuildingEffectPercentage MillExploreSold = new("Mill Explore SOld", 0.02);
+        public BuildingEffectPercentage BankPercentage = new("Bank percentage", 0.015);
+        public BuildingEffectFlat BankFlat = new("Farm flat", 25);
+        public BuildingEffectPercentage TrainingGroundOme = new("Training Ground OME", 0.015);
+        public BuildingEffectPercentage TrainingGroundMerc = new("Training Ground Merc", 0.02);
+        public BuildingEffectPercentage ArmouryWage = new("Armoury wage", 0.02);
+        public BuildingEffectPercentage ArmouryDraftCost = new("Armoury draft", 0.02);
+        public BuildingEffectPercentage ArmouryTrainingCost = new("Armoury training", 0.015);
+        public BuildingEffectPercentage Barracks = new("Barracks", 0.015);
+        public BuildingEffectPercentage Fort = new("Fort", 0.015);
+        public BuildingEffectPercentage GuardStation = new("Guard Station", 0.015);
+        public BuildingEffectPercentage HospitalCasualties = new("Hospital casualties", 0.03);
+        public BuildingEffectPercentage HospitalPlague = new("Hospital plague", 0.03);
+        public BuildingEffectFlat Guild = new("Guild", 0.02, false);
+        public BuildingEffectFlat Tower = new("Tower", 12);
+        public BuildingEffectPercentage ThievesDenLosses = new("Thieves Den losses", 0.04, 0.95);
+        public BuildingEffectPercentage ThievesDenTpa = new("Thieves Den TPA", 0.03);
+        public BuildingEffectPercentage WatchTowerCatch = new("Watch Tower catch", 0.015);
+        public BuildingEffectPercentage WatchTowerDamage = new("Watch Tower", 0.025);
+        public BuildingEffectPercentage UniversityScientistsSpawn = new("University scientist spawn", 0.02, false);
+        public BuildingEffectPercentage UniversityScience = new("University science", 0.01, false);
+        public BuildingEffectPercentage Library = new("Library", 0.01, false);
+        public BuildingEffectCapacity StableCapacity = new("Stable Capacity", 80);
+        public BuildingEffectFlat StableProduction = new("Stable Production", 2);
+        public BuildingEffectCapacity Dungeon = new("Dungeon", 30);
     }
 }

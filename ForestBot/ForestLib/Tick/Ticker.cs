@@ -8,6 +8,10 @@ namespace ForestLib.Tick
         public ProvinceState State { get; }
         public UtopiaDate Date { get; private set; }
 
+        // TODO: starvation
+        // TODO: ME
+        // TODO: BE
+
         public Ticker(Age100Settings age, ProvinceState provinceState, UtopiaDate date)
         {
             Age = age;
@@ -21,11 +25,17 @@ namespace ForestLib.Tick
             Construction();
             Income();
             Food();
+            Runes();
             PeasantGrowth();
             WizardGrowth();
             Draft();
             Training();
             ScientistGrowth();
+        }
+
+        private void Runes()
+        {
+            throw new NotImplementedException();
         }
 
         private void Training()
@@ -65,7 +75,8 @@ namespace ForestLib.Tick
 
         private void WizardGrowth()
         {
-            throw new NotImplementedException();
+            State.Wizards +=
+                (int)Age.BuildingEffects.Guild.EffectiveFlatRate(State.BuildingEffectiveness, State.Buildings.Guilds, State.Personality.GuildEffectiveness);
         }
 
         private void PeasantGrowth()
@@ -85,7 +96,20 @@ namespace ForestLib.Tick
 
         private void Construction()
         {
-            throw new NotImplementedException();
+            List<Tuple<int, Buildings>> post = new();
+            foreach (var constructionTick in State.BuildinsInProgress)
+            {
+                if (constructionTick.Item1 == 0)
+                {
+                    State.Buildings.Add(constructionTick.Item2);
+                }
+                else
+                {
+                    post.Add(new Tuple<int, Buildings>(constructionTick.Item1 - 1, constructionTick.Item2));
+                }
+            }
+
+            State.BuildinsInProgress = post;
         }
     }
 }
