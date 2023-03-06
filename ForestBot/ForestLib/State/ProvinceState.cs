@@ -8,16 +8,12 @@ using System.Threading.Tasks;
 namespace ForestLib.State
 {
 
-    public enum Personality
-    {
-        Cleric, Heretic, Merchant, Mystic, Rogue, Sage, Shepherd, 
-        Tactician, WarHero, Warrior
-    }
     public class ProvinceState
     {
         public Race Race;
         public Personality Personality;
         public int Acres;
+        public int Honor;
         public int Peasants;
         public double BuildingEffectiveness;
         public int Money;
@@ -45,6 +41,15 @@ namespace ForestLib.State
         public int DefSpecs;
         public int Elites;
         public int Theives;
+
+        public void Add(MilitaryPopulation other)
+        {
+            Soldiers += other.Soldiers;
+            OffSpecs += other.OffSpecs;
+            DefSpecs += other.DefSpecs;
+            Elites += other.Elites;
+            Theives += other.Theives;
+        }
     }
 
     public class Buildings
@@ -70,10 +75,11 @@ namespace ForestLib.State
             Dungeons;
     }
 
+
     public class Science
     {
-        private double totalMod;
-        private double multiplier;
+        private readonly double totalMod;
+        private readonly double multiplier;
 
         public Science(double totalMod, double multiplier)
         {

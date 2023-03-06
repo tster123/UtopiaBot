@@ -8,9 +8,9 @@ namespace ForestLib.Tools
 {
     public class CeasefireSimulator
     {
-        private readonly AgeSettings age;
+        private readonly Age100Settings age;
 
-        public CeasefireSimulator(AgeSettings age)
+        public CeasefireSimulator(Age100Settings age)
         {
             this.age = age;
         }

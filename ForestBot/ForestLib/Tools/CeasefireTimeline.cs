@@ -15,10 +15,10 @@
     }
     public class CeasefireTimeline
     {
-        private readonly AgeSettings age;
+        private readonly Age100Settings age;
         private readonly StrategySettings strat;
 
-        public CeasefireTimeline(AgeSettings age, StrategySettings strat)
+        public CeasefireTimeline(Age100Settings age, StrategySettings strat)
         {
             this.age = age;
             this.strat = strat;
