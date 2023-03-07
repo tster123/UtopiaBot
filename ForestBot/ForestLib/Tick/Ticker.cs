@@ -133,19 +133,36 @@ namespace ForestLib.Tick
                     throw new ArgumentException("unknown draftRate: " + State.DraftRate);
             }
 
-            double heroismScience = 1; // TODO: fix science.
+            double heroism = 0; // TODO: fix science.
+            double draftRitual = 1; // TODO: factor ritual
+
+
 
             // Cost of Soldier Drafting = Current Draft Level Factor * Draft Rate * Race Bonus * Personality Bonus * Armouries Mod * Heroism Science Effect * Sloth Effect
             // Current Draft Level Factor scales base soldier draft cost upwards once 50% of max population is reached
             // Draft Level Factor is MAX(1.0154 * ((Solds + Ospecs + Dspecs + Elites) / maxpop) ^ 2 + 1.1759 * ((Solds + Ospecs + Dspecs + Elites) / maxpop) + 0.3633, 1) * base rate for level
             double draftPerc = State.TotalMilitaryPopulation / (double)State.GetMaxPopulation(Age);
             double levelFactor = Math.Max(1.0154 * draftPerc * draftPerc + 1.1759 * draftPerc + 0.3633, 1);
-
-            // TODO: complete cost and rate
+            double armouryCostSavings = Age.BuildingEffects.ArmouryDraftCost.EffectiveEffect(State.BuildingEffectiveness, State.Buildings.Armouries, State.Acres);
+            int draftCost = (int)(levelFactor * cost * (1 - armouryCostSavings) * (1 - heroism));
 
             // Draft Rate = Base Draft Rate * Patriotism Bonus * Heroism Science Effect * Sloth * Ritual
+            double draftRate = rate * 1.3 * (1 + heroism) * draftRitual;
 
-            throw new NotImplementedException();
+            int numDraft = (int)(State.Peasants * draftRate);
+            int totalCost = draftCost * numDraft;
+
+            int overdraft = totalCost - State.Money;
+            if (overdraft > 0)
+            {
+                int numReduce = 1 + (overdraft / draftCost);
+                numDraft  -= numReduce;
+                totalCost =  draftCost * numDraft;
+            }
+
+            State.Money             -= totalCost;
+            State.Peasants          -= numDraft;
+            State.Military.Soldiers += numDraft;
         }
 
         private void WizardGrowth()
