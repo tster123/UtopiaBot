@@ -21,7 +21,9 @@ namespace ForestLib.State
         public int Peasants;
         public double MaxDraft;
         public DraftRate DraftRate;
+        public double WageRate;
         public double BuildingEffectiveness;
+        public double MilitaryEfficiency;
         public int Money;
         public int Food;
         public int Runes;
@@ -38,6 +40,16 @@ namespace ForestLib.State
         public List<Tuple<int, Buildings>> BuildinsInProgress;
         public ProvinceScience Science;
 
+        public int TotalMilitaryPopulation => Military.Sum() + MilitaryTraining.Select(t => t.Item2.Sum()).Sum();
+
+        public int GetMaxPopulation(Age100Settings age)
+        {
+            double popScience = 1; // TODO: science
+            double inHomes =
+                age.BuildingEffects.HomeCapacity.EffectiveCapacity(BuildingEffectiveness, Buildings.Homes,
+                    Race.HomeBonus);
+            return (int) ((25 * (Acres - Buildings.Barren) + 15 * Buildings.Barren + inHomes) * Race.Population * popScience);
+        }
     }
 
     public class MilitaryPopulation
@@ -56,6 +68,8 @@ namespace ForestLib.State
             Elites += other.Elites;
             Theives += other.Theives;
         }
+
+        public int Sum() => Soldiers + OffSpecs + DefSpecs + Elites + Theives;
     }
 
     public class Buildings
@@ -102,6 +116,26 @@ namespace ForestLib.State
             Stables += other.Stables;
             Dungeons += other.Dungeons;
         }
+
+        public int Built =>
+            Homes +
+            Farms +
+            Mills +
+            Banks +
+            TrainingGrounds +
+            Armouries +
+            Barracks +
+            Forts +
+            GuardStations +
+            Hospitals +
+            Guilds +
+            Towers +
+            ThievesDns +
+            WatchTowers +
+            Universities +
+            Libraries +
+            Stables +
+            Dungeons;
     }
 
 
