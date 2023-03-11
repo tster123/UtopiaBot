@@ -10,7 +10,7 @@ namespace ForestTests
         public void TestTimeline()
         {
             CeasefireTimeline timeline = new CeasefireTimeline(new Age100Settings(), new StrategySettings());
-            var ret = timeline.GetTimeline(new UtopiaDate(3, 1, 1));
+            var ret = timeline.GetTimeline(new UtopiaDate(3, 7, 21));
             foreach (var e in ret)
             {
                 Console.WriteLine(e);
