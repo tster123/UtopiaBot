@@ -4,7 +4,7 @@ namespace ForestLib.AgeSettings;
 
 public class ScienceEffect
 {
-    public readonly string name;
+    private readonly string name;
     private readonly double multiplier;
 
     public ScienceEffect(string name, double multiplier)
@@ -20,11 +20,20 @@ public class ScienceEffect
 
     public double GetBonus(int books, ProvinceState state, IAgeSettings age)
     {
-        double ret = Math.Pow(books, (1 / 2.125));
-        ret *= state.Race.Science;
-        // TODO: sage has scientific insights
-        ret *= (1 + age.GetBuildingEffects().Library.EffectiveEffect(state.BuildingEffectiveness, state.Buildings.Libraries, state.Acres));
-        return ret;
+        return (Math.Pow(books, (1 / 2.125)) * multiplier * GetTotalMod(state, age)) / 100.0;
+    }
+
+    public int CalculateBooksNeededFor(double bonus, ProvinceState state, IAgeSettings age)
+    {
+        double mod = GetTotalMod(state, age);
+        return (int)Math.Pow((bonus * 100 / (multiplier * mod)), (2.125 / 1.0));
+    }
+
+    private double GetTotalMod(ProvinceState state, IAgeSettings age)
+    {
+        double libEffect = (1 + age.GetBuildingEffects().Library.EffectiveEffect(state.BuildingEffectiveness, state.Buildings.Libraries, state.Acres));
+        // TODO: account for sage has scientific insights
+        return state.Race.Science * libEffect;
     }
 }
 

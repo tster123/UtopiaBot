@@ -63,9 +63,14 @@ namespace ForestLib.Tick
             double availableWorkers = State.Peasants + State.Prisoners;
             double optimalWorkers = .67 * 25 * (State.Buildings.Built - State.Buildings.Homes);
             double performed = Math.Min(1, availableWorkers / optimalWorkers);
-            //double targetBe = (0.5 * (1 + performed)) * State.Race.BuildingEfficiency * State.Science.Tools.Effect
-            //TODO: need to fix science to work more like buildings and then finish this accounting for tools science.
-            throw new NotImplementedException();
+
+            double toolsScienceBonus = Age.GetScienceEffects().Tools.GetBonus(State.Science.Tools, State, Age);
+            double targetBe = (0.5 * (1 + performed)) * State.Race.BuildingEfficiency * (1 + toolsScienceBonus);
+
+            double movementPercentage = (1 - 1 / Math.Pow(2, 1 / 12.0));
+            double beDiff = targetBe - State.BuildingEffectiveness;
+            double predictedBe = State.BuildingEffectiveness + beDiff * movementPercentage;
+            State.BuildingEffectiveness = predictedBe;
         }
 
         private void Runes()
@@ -135,7 +140,7 @@ namespace ForestLib.Tick
                     throw new ArgumentException("unknown draftRate: " + State.DraftRate);
             }
 
-            double heroism = 0; // TODO: fix science.
+            double heroism = Age.GetScienceEffects().Heroism.GetBonus(State.Science.Heroism, State, Age);
             double draftRitual = 1; // TODO: factor ritual
 
 
