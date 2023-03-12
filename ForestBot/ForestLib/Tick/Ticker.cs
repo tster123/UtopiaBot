@@ -1,11 +1,12 @@
-﻿using ForestLib.AgeSettings.Ages;
+﻿using ForestLib.AgeSettings;
+using ForestLib.AgeSettings.Ages;
 using ForestLib.State;
 
 namespace ForestLib.Tick
 {
     public class Ticker
     {
-        public Age100Settings Age { get; }
+        public IAgeSettings Age { get; }
         public ProvinceState State { get; }
         public UtopiaDate Date { get; private set; }
 
@@ -70,7 +71,7 @@ namespace ForestLib.Tick
         private void Runes()
         {
             State.Runes +=
-                (int) Age.BuildingEffects.Tower.EffectiveFlatRate(State.BuildingEffectiveness, State.Buildings.Towers);
+                (int) Age.GetBuildingEffects().Tower.EffectiveFlatRate(State.BuildingEffectiveness, State.Buildings.Towers);
             State.Runes = (int) (State.Runes * .988);
         }
 
@@ -94,7 +95,7 @@ namespace ForestLib.Tick
 
         private void ScientistGrowth()
         {
-            double uni = Age.BuildingEffects.UniversityScientistsSpawn.EffectiveEffect(State.BuildingEffectiveness, State.Buildings.Universities, State.Acres);
+            double uni = Age.GetBuildingEffects().UniversityScientistsSpawn.EffectiveEffect(State.BuildingEffectiveness, State.Buildings.Universities, State.Acres);
             double growth = .02 * State.Buildings.Universities * uni;
             State.Science.ProgressToNextScientist += growth;
             if (State.Science.ProgressToNextScientist >= 1.0)
@@ -144,7 +145,7 @@ namespace ForestLib.Tick
             // Draft Level Factor is MAX(1.0154 * ((Solds + Ospecs + Dspecs + Elites) / maxpop) ^ 2 + 1.1759 * ((Solds + Ospecs + Dspecs + Elites) / maxpop) + 0.3633, 1) * base rate for level
             double draftPerc = State.TotalMilitaryPopulation / (double)State.GetMaxPopulation(Age);
             double levelFactor = Math.Max(1.0154 * draftPerc * draftPerc + 1.1759 * draftPerc + 0.3633, 1);
-            double armouryCostSavings = Age.BuildingEffects.ArmouryDraftCost.EffectiveEffect(State.BuildingEffectiveness, State.Buildings.Armouries, State.Acres);
+            double armouryCostSavings = Age.GetBuildingEffects().ArmouryDraftCost.EffectiveEffect(State.BuildingEffectiveness, State.Buildings.Armouries, State.Acres);
             int draftCost = (int)(levelFactor * cost * (1 - armouryCostSavings) * (1 - heroism));
 
             // Draft Rate = Base Draft Rate * Patriotism Bonus * Heroism Science Effect * Sloth * Ritual
@@ -169,7 +170,7 @@ namespace ForestLib.Tick
         private void WizardGrowth()
         {
             State.Wizards +=
-                (int)Age.BuildingEffects.Guild.EffectiveFlatRate(State.BuildingEffectiveness, State.Buildings.Guilds, State.Personality.GuildEffectiveness);
+                (int)Age.GetBuildingEffects().Guild.EffectiveFlatRate(State.BuildingEffectiveness, State.Buildings.Guilds, State.Personality.GuildEffectiveness);
         }
 
         private void PeasantGrowth()

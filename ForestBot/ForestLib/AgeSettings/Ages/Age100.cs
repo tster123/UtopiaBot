@@ -53,19 +53,25 @@ public class Age100Settings : IAgeSettings
     public Personality WarHero = new("WarHero") { HonorEffectiveness = 2 };
     public Personality Warrior = new("Warrior") { Wages = .8 };
     public Personality[] Personalities { get; }
-    
-    public IBuildingEffects GetBuildingEffects()
-    {
-        return BuildingEffects;
-    }
 
-    public BuildingEffectsAge100 BuildingEffects { get; }
-
+    private BuildingEffectsAge100 buildingEffects;
+    private ScienceEffectsAge100 scienceEffects;
     public Age100Settings()
     {
         Races = new[] { Avian, Dwarf, Elf, Faery, Halfling, Human, Orc, Undead };
         Personalities = new[] { Cleric, Heretic, Merchant, Mystic, Rogue, Sage, Shepherd, Tactician, WarHero, Warrior };
-        BuildingEffects = new BuildingEffectsAge100();
+        buildingEffects = new BuildingEffectsAge100();
+        scienceEffects = new ScienceEffectsAge100();
+    }
+
+    public IBuildingEffects GetBuildingEffects()
+    {
+        return buildingEffects;
+    }
+
+    public IScienceEffects GetScienceEffects()
+    {
+        return scienceEffects;
     }
 }
 
@@ -103,4 +109,25 @@ public class BuildingEffectsAge100 : IBuildingEffects
     public BuildingEffectCapacity StableCapacity { get; } = new("Stable Capacity", 80);
     public BuildingEffectFlat StableProduction { get; } = new("Stable Production", 2);
     public BuildingEffectCapacity Dungeon { get; } = new("Dungeon", 30);
+}
+public class ScienceEffectsAge100 : IScienceEffects
+{
+    public ScienceEffect Alchemy { get; } = new("Alchemy", 0.0724);
+    public ScienceEffect Tools { get; } = new("Tools", 0.0524);
+    public ScienceEffect Housing { get; } = new("Housing", 0.0262);
+    public ScienceEffect Production { get; } = new("Production", 0.2172);
+    public ScienceEffect Bookkeeping { get; } = new("Bookkeeping", 0.068);
+    public ScienceEffect Artisan { get; } = new("Artisan", 0.0478);
+    public ScienceEffect Strategy { get; } = new("Strategy", 0.0367);
+    public ScienceEffect Siege { get; } = new("Siege", 0.0262);
+    public ScienceEffect Tactics { get; } = new("Tactics", 0.0367);
+    public ScienceEffect Valor { get; } = new("Valor", 0.0582);
+    public ScienceEffect Heroism { get; } = new("Heroism", 0.0418);
+    public ScienceEffect Resilience { get; } = new("Resilience", 0.0367);
+    public ScienceEffect Crime { get; } = new("Crime", 0.1557);
+    public ScienceEffect Channeling { get; } = new("Channeling", 0.1875);
+    public ScienceEffect Shielding { get; } = new("Shielding", 0.0314);
+    public ScienceEffect Sorcery { get; } = new("Sorcery", 0.0314);
+    public ScienceEffect Cunning { get; } = new("Cunning", 0.0314);
+    public ScienceEffect Finesse { get; } = new("Finesse", 0.0478);
 }

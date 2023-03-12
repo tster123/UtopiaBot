@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
+using ForestLib.AgeSettings;
 using ForestLib.AgeSettings.Ages;
 
 namespace ForestLib.State
@@ -43,11 +44,11 @@ namespace ForestLib.State
 
         public int TotalMilitaryPopulation => Military.Sum() + MilitaryTraining.Select(t => t.Item2.Sum()).Sum();
 
-        public int GetMaxPopulation(Age100Settings age)
+        public int GetMaxPopulation(IAgeSettings age)
         {
             double popScience = 1; // TODO: science
             double inHomes =
-                age.BuildingEffects.HomeCapacity.EffectiveCapacity(BuildingEffectiveness, Buildings.Homes,
+                age.GetBuildingEffects().HomeCapacity.EffectiveCapacity(BuildingEffectiveness, Buildings.Homes,
                     Race.HomeBonus);
             return (int) ((25 * (Acres - Buildings.Barren) + 15 * Buildings.Barren + inHomes) * Race.Population * popScience);
         }
