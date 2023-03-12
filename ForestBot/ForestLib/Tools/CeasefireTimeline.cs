@@ -1,4 +1,4 @@
-﻿using ForestLib.AgeSettings;
+﻿using ForestLib.AgeSettings.Ages;
 
 namespace ForestLib.Tools
 {

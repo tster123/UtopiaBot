@@ -1,4 +1,4 @@
-﻿using ForestLib.AgeSettings;
+﻿using ForestLib.AgeSettings.Ages;
 using ForestLib.State;
 
 namespace ForestLib.Tick

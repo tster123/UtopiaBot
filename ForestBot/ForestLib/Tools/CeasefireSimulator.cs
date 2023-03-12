@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ForestLib.AgeSettings;
+using ForestLib.AgeSettings.Ages;
 
 namespace ForestLib.Tools
 {
