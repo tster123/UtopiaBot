@@ -1,4 +1,6 @@
-﻿namespace ForestLib.Tools
+﻿using ForestLib.AgeSettings;
+
+namespace ForestLib.Tools
 {
     public class TimelineEvent
     {
