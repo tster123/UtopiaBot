@@ -33,6 +33,40 @@ where Timestamp > '2023-03-07 17:00' and TargetKingdom is null and TargetProvinc
 group by SourceProvince, OpName
 order by SourceProvince, OpName
 
+-- murder beast
+select v.SourceProvince, sum(v.Damage)
+from
+(select SourceProvince, TargetProvince, Damage 
+from Attacks
+where TargetKingdom = '4:3' and AttackType = 'mass'
+union all
+select SourceProvince, TargetProvince, Kills + Prisoners 
+from Attacks where TargetKingdom = '4:3'
+union all
+select SourceProvince, TargetProvince, Damage
+from Operations 
+where TargetKingdom = '4:3' and Success = 1 and OpName in ('fireball', 'nightstrike', 'assassinate wizards')
+) v
+group by v.SourceProvince
+order by sum(v.Damage) DESC
+
+-- murder methods
+select v.SourceProvince, v.Method, sum(v.Damage)
+from
+(select SourceProvince, 'massacre' as Method, TargetProvince, Damage 
+from Attacks
+where TargetKingdom = '4:3' and AttackType = 'mass'
+union all
+select SourceProvince, 'casualty' as Method, TargetProvince, Kills + Prisoners 
+from Attacks where TargetKingdom = '4:3'
+union all
+select SourceProvince, OpName as Method, TargetProvince, Damage
+from Operations 
+where TargetKingdom = '4:3' and Success = 1 and OpName in ('fireball', 'nightstrike', 'assassinate wizards')
+) v
+group by v.Method, v.SourceProvince  with rollup
+order by SourceProvince desc
+
 select top 1000 * from Operations where TargetKingdom is null order by Timestamp desc
 
 select Timestamp, SourceProvince, TargetProvince, OpName, Success, Damage from Operations where TargetKingdom is null and SourceProvince = 'Not the Momma' and TargetProvince is not null
