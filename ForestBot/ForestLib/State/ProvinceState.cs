@@ -14,12 +14,44 @@ namespace ForestLib.State
         None, Reserve, Normal, Aggressive, Emergency
     }
 
+    public class Honor
+    {
+        public string Name { get; }
+        public int Amount { get; }
+        private readonly int level;
+
+        public Honor(int honor)
+        {
+            Amount = honor;
+            level = Math.Max(8, Amount / 750);
+            Name = new[]
+            {
+                "Peasant",
+                "Knight",
+                "Lord",
+                "Baron",
+                "Viscount",
+                "Count",
+                "Marquis",
+                "Duke",
+                "Prince"
+            }[level];
+        }
+
+        public double PopulationBonus => 0.01 * level;
+        public double MilitaryEfficiencyBonus => 0.01 * level;
+        public double IncomeBonus => 0.02 * level;
+        public double ProductionBonus => 0.02 * level;
+        public double TPABonus => 0.03 * level;
+        public double WPABonus => 0.03 * level;
+    }
+
     public class ProvinceState
     {
         public Race Race;
         public Personality Personality;
         public int Acres;
-        public int Honor;
+        public Honor Honor;
         public int Peasants;
         public double MaxDraft;
         public DraftRate DraftRate;
@@ -46,11 +78,16 @@ namespace ForestLib.State
 
         public int GetMaxPopulation(IAgeSettings age)
         {
-            double popScience = 1; // TODO: science
+            double popScience = 1 + age.GetScienceEffects().Housing.GetBonus(Science.Housing, this, age);
             double inHomes =
                 age.GetBuildingEffects().HomeCapacity.EffectiveCapacity(BuildingEffectiveness, Buildings.Homes,
                     Race.HomeBonus);
             return (int) ((25 * (Acres - Buildings.Barren) + 15 * Buildings.Barren + inHomes) * Race.Population * popScience);
+        }
+
+        public int GetTotalPopulation()
+        {
+            return Peasants + Wizards + Military.Sum() + MilitaryTraining.Sum(t => t.Item2.Sum());
         }
     }
 

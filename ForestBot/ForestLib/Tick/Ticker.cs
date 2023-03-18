@@ -10,6 +10,8 @@ namespace ForestLib.Tick
         public ProvinceState State { get; }
         public UtopiaDate Date { get; private set; }
 
+        public int? TicksSinceCeasefireStart { get; set; }
+
         public bool PatriatismOn { get; set; }
         // TODO: starvation
 
@@ -34,6 +36,7 @@ namespace ForestLib.Tick
             ScientistGrowth();
             UpdateBuildingEfficiency();
             UpdateMilitaryEfficiency();
+            if (TicksSinceCeasefireStart != null) TicksSinceCeasefireStart++;
         }
 
         private void UpdateMilitaryEfficiency()
@@ -174,13 +177,35 @@ namespace ForestLib.Tick
 
         private void WizardGrowth()
         {
-            State.Wizards +=
-                (int)Age.GetBuildingEffects().Guild.EffectiveFlatRate(State.BuildingEffectiveness, State.Buildings.Guilds, State.Personality.GuildEffectiveness);
+            int wizardsTrained = (int)Age.GetBuildingEffects().Guild.EffectiveFlatRate(State.BuildingEffectiveness,
+                State.Buildings.Guilds, State.Personality.GuildEffectiveness);
+            State.Wizards += wizardsTrained;
+            State.Peasants -= wizardsTrained;
         }
 
         private void PeasantGrowth()
         {
-            throw new NotImplementedException();
+            int maxPop = State.GetMaxPopulation(Age);
+            int currentPop = State.GetTotalPopulation();
+            if (maxPop == currentPop) return;
+            if (maxPop < currentPop)
+            {
+                // overpop
+                double leave = Math.Min(.1 * State.Peasants, currentPop - maxPop);
+                State.Peasants -= (int)leave;
+                return;
+            }
+            //Peasants Hourly Change = (Current Peasants * ((Birth Rate + Love & Peace) * Race Bonus * EOWCF * Chastity - Storms)) + (Homes bonus * Chastity) - Drafted Soldiers - Wizards Trained
+            // Base birth rate is 2.05% and ranges from 1.9457% up to 2.1525% (± 5% of 2.05%)
+            // * +1000% Birthrate (minimum 500) for the first 36 hours
+            double birthRate = 0.0205;
+            if (TicksSinceCeasefireStart is < 36)
+            {
+                birthRate *= 10;
+            }
+
+            int born = Math.Min((int)(birthRate * State.Peasants), maxPop - currentPop);
+            State.Peasants += born;
         }
 
         private void Food()
@@ -190,7 +215,29 @@ namespace ForestLib.Tick
 
         private void Income()
         {
-            throw new NotImplementedException();
+            // Raw Income = (3 * Employed Peasants) + (1 * Unemployed Peasants) + (0.75 * Prisoners) + Racial Gold Generation + (Banks * 25 * BE) + Miner's Mystique Gold Generation
+            // Modified Income = Raw Income * Plague * Riots * Bank % Bonus * Income Sci * Honor Income Mod 
+            //     *Race Mod* Personality Mod* Dragon *Ritual
+            int jobs = 25 * (State.Buildings.Built - State.Buildings.Homes);
+            int employedPeons = Math.Min(jobs, State.Peasants);
+            int unemployedPeons = Math.Max(0, State.Peasants - jobs);
+            double bankBase = (int) Age.GetBuildingEffects().BankFlat.EffectiveFlatRate(State.BuildingEffectiveness, State.Buildings.Banks);
+            double rawIncome = bankBase + 3.0 * employedPeons + 1.0 * unemployedPeons + 0.75 * State.Prisoners;
+
+            double bankMod = Age.GetBuildingEffects().BankPercentage.EffectiveEffect(State, State.Buildings.Banks);
+            double incomeScience = Age.GetScienceEffects().Alchemy.GetBonus(State.Science.Alchemy, State, Age);
+            double honorBonus = State.Honor.IncomeBonus;
+            double income = rawIncome * (1 + bankMod) + (1 + incomeScience) * (1 + honorBonus);
+            
+            // Military Expenses = (((Def specs + Off specs )*0.5) + Elites * 0.75) * Wage Rate * Armouries Bonus * Race Mod * Personality Mod * max(Inspire Army , Hero's Inspiration) * Greed * Ritual * Dragon * Bookkeeping Science Effect 
+            MilitaryPopulation mil = State.Military;
+            double wages = (mil.DefSpecs + mil.OffSpecs) * 0.5 + 0.75 * mil.Elites;
+            double armSavings = Age.GetBuildingEffects().ArmouryWage.EffectiveEffect(State, State.Buildings.Armouries);
+            double wageScience = Age.GetScienceEffects().Bookkeeping.GetBonus(State.Science.Bookkeeping, State, Age);
+            wages = wages * State.WageRate * (1 - armSavings) * State.Personality.Wages * (1 - wageScience);
+
+            State.Money += (int)(income - wages);
+            if (State.Money < 0)
         }
 
         private void Construction()

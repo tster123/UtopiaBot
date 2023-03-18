@@ -1,4 +1,6 @@
-﻿namespace ForestLib.AgeSettings;
+﻿using ForestLib.State;
+
+namespace ForestLib.AgeSettings;
 
 public class BuildingEffectFlat
 {
@@ -66,6 +68,11 @@ public class BuildingEffectPercentage
         be = AffectedByBe ? be : 1;
         // Base Effect * BE * MIN(50%, % of building * (1 + Race)) * (100% - MIN(50%, % of building * (1 + Race)))
         return BaseEffect * be * Math.Min(.5, percentage * race) * (1 - Math.Min(0.5, percentage * race));
+    }
+
+    public double EffectiveEffect(ProvinceState state, int numBuildings, double race = 1)
+    {
+        return EffectiveEffect(state.BuildingEffectiveness, numBuildings, state.Acres, race);
     }
 }
 
