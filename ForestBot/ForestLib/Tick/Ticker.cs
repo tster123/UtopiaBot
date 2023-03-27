@@ -1,9 +1,19 @@
 ﻿using ForestLib.AgeSettings;
 using ForestLib.AgeSettings.Ages;
 using ForestLib.State;
+using Microsoft.Identity.Client;
 
 namespace ForestLib.Tick
 {
+
+    public class TickResult
+    {
+        public int FoodEaten, FoodProduced, FoodDecayed;
+        public int? StarvationDeficit;
+        public int RunesProduced, RunesDecayed;
+        public int GoldIncome, GoldWagesSpent, GoldDraftSpent;
+        public bool AllWagesPaid;
+    }
     public class Ticker
     {
         public IAgeSettings Age { get; }
@@ -22,12 +32,13 @@ namespace ForestLib.Tick
             Date = date;
         }
 
-        public void Tick()
+        public TickResult Tick()
         {
+            TickResult result = new();
             Date = Date.AddTicks(1);
             Construction();
             Income();
-            Food();
+            Food(result);
             Runes();
             PeasantGrowth();
             WizardGrowth();
@@ -37,6 +48,7 @@ namespace ForestLib.Tick
             UpdateBuildingEfficiency();
             UpdateMilitaryEfficiency();
             if (TicksSinceCeasefireStart != null) TicksSinceCeasefireStart++;
+            return result;
         }
 
         private void UpdateMilitaryEfficiency()
@@ -75,12 +87,38 @@ namespace ForestLib.Tick
             double predictedBe = State.BuildingEffectiveness + beDiff * movementPercentage;
             State.BuildingEffectiveness = predictedBe;
         }
+        private void Food(TickResult result)
+        {
+            double farmFood = Age.GetBuildingEffects().Farm.EffectiveFlatRate(State.BuildingEffectiveness, State.Buildings.Farms);
+            double barrenFood = Age.GetBuildingEffects().BarrenFood.EffectiveFlatRate(State.BuildingEffectiveness, State.Buildings.Barren);
+            double prodScience = Age.GetScienceEffects().Production.GetBonus(State.Science.Production, State, Age);
+            
+            double decay = State.Food * 0.01;
 
+            double fertileLands = 1.25;
+
+            double baseFoodProd = farmFood + barrenFood;
+            double modFoodProd = baseFoodProd * (1 + prodScience) * fertileLands;
+
+            double eaten = State.Race.FoodConsumption * State.GetTotalPopulation() * 0.25;
+
+            State.Food = (int) (State.Food - decay + modFoodProd - eaten);
+            if (State.Food < 0)
+            {
+                result.StarvationDeficit = -1 * State.Food;
+                State.Food = 0;
+            }
+
+            result.FoodDecayed = (int)decay;
+            result.FoodEaten = (int)eaten;
+            result.FoodProduced = (int)modFoodProd;
+        }
         private void Runes()
         {
-            State.Runes +=
-                (int) Age.GetBuildingEffects().Tower.EffectiveFlatRate(State.BuildingEffectiveness, State.Buildings.Towers);
-            State.Runes = (int) (State.Runes * .988);
+            double baseRunes = Age.GetBuildingEffects().Tower.EffectiveFlatRate(State.BuildingEffectiveness, State.Buildings.Towers);
+            double prodScience = Age.GetScienceEffects().Production.GetBonus(State.Science.Production, State, Age);
+            State.Runes += (int)(baseRunes * (1 + prodScience));
+            State.Runes = (int)(State.Runes * .988);
         }
 
         private void Training()
@@ -206,11 +244,6 @@ namespace ForestLib.Tick
 
             int born = Math.Min((int)(birthRate * State.Peasants), maxPop - currentPop);
             State.Peasants += born;
-        }
-
-        private void Food()
-        {
-            throw new NotImplementedException();
         }
 
         private void Income()
