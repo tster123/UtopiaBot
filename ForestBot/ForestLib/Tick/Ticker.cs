@@ -1,7 +1,6 @@
 ﻿using ForestLib.AgeSettings;
 using ForestLib.AgeSettings.Ages;
 using ForestLib.State;
-using Microsoft.Identity.Client;
 
 namespace ForestLib.Tick
 {
@@ -11,8 +10,10 @@ namespace ForestLib.Tick
         public int FoodEaten, FoodProduced, FoodDecayed;
         public int? StarvationDeficit;
         public int RunesProduced, RunesDecayed;
-        public int GoldIncome, GoldWagesSpent, GoldDraftSpent;
+        public int GoldIncome, GoldWagesOwed, GoldWagesPaid, GoldDraftSpent;
+        public int SoldiersDrafted;
         public bool AllWagesPaid;
+        public int PeasantGrowth;
     }
     public class Ticker
     {
@@ -37,12 +38,12 @@ namespace ForestLib.Tick
             TickResult result = new();
             Date = Date.AddTicks(1);
             Construction();
-            Income();
+            Income(result);
             Food(result);
-            Runes();
-            PeasantGrowth();
+            Runes(result);
+            PeasantGrowth(result);
             WizardGrowth();
-            Draft();
+            Draft(result);
             Training();
             ScientistGrowth();
             UpdateBuildingEfficiency();
@@ -113,12 +114,14 @@ namespace ForestLib.Tick
             result.FoodEaten = (int)eaten;
             result.FoodProduced = (int)modFoodProd;
         }
-        private void Runes()
+        private void Runes(TickResult result)
         {
             double baseRunes = Age.GetBuildingEffects().Tower.EffectiveFlatRate(State.BuildingEffectiveness, State.Buildings.Towers);
             double prodScience = Age.GetScienceEffects().Production.GetBonus(State.Science.Production, State, Age);
-            State.Runes += (int)(baseRunes * (1 + prodScience));
-            State.Runes = (int)(State.Runes * .988);
+            result.RunesProduced = (int)(baseRunes * (1 + prodScience));
+            State.Runes += result.RunesProduced;
+            result.RunesDecayed = (int)(State.Runes * 0.012);
+            State.Runes -= result.RunesDecayed;
         }
 
         private void Training()
@@ -151,7 +154,7 @@ namespace ForestLib.Tick
             }
         }
 
-        private void Draft()
+        private void Draft(TickResult result)
         {
             //Reservist   0.3 % 30gc
             //    Normal  0.6 % 50gc
@@ -208,6 +211,8 @@ namespace ForestLib.Tick
                 totalCost =  draftCost * numDraft;
             }
 
+            result.GoldDraftSpent = totalCost;
+            result.SoldiersDrafted = numDraft;
             State.Money             -= totalCost;
             State.Peasants          -= numDraft;
             State.Military.Soldiers += numDraft;
@@ -221,7 +226,7 @@ namespace ForestLib.Tick
             State.Peasants -= wizardsTrained;
         }
 
-        private void PeasantGrowth()
+        private void PeasantGrowth(TickResult result)
         {
             int maxPop = State.GetMaxPopulation(Age);
             int currentPop = State.GetTotalPopulation();
@@ -231,6 +236,7 @@ namespace ForestLib.Tick
                 // overpop
                 double leave = Math.Min(.1 * State.Peasants, currentPop - maxPop);
                 State.Peasants -= (int)leave;
+                result.PeasantGrowth = -1 * (int)leave;
                 return;
             }
             //Peasants Hourly Change = (Current Peasants * ((Birth Rate + Love & Peace) * Race Bonus * EOWCF * Chastity - Storms)) + (Homes bonus * Chastity) - Drafted Soldiers - Wizards Trained
@@ -243,10 +249,11 @@ namespace ForestLib.Tick
             }
 
             int born = Math.Min((int)(birthRate * State.Peasants), maxPop - currentPop);
+            result.PeasantGrowth = born;
             State.Peasants += born;
         }
 
-        private void Income()
+        private void Income(TickResult result)
         {
             // Raw Income = (3 * Employed Peasants) + (1 * Unemployed Peasants) + (0.75 * Prisoners) + Racial Gold Generation + (Banks * 25 * BE) + Miner's Mystique Gold Generation
             // Modified Income = Raw Income * Plague * Riots * Bank % Bonus * Income Sci * Honor Income Mod 
@@ -270,7 +277,15 @@ namespace ForestLib.Tick
             wages = wages * State.WageRate * (1 - armSavings) * State.Personality.Wages * (1 - wageScience);
 
             State.Money += (int)(income - wages);
+            result.GoldWagesOwed = (int)wages;
+            result.GoldWagesPaid = result.GoldWagesOwed;
+            result.GoldIncome = (int)income;
+            result.AllWagesPaid = State.Money >= 0;
             if (State.Money < 0)
+            {
+                result.GoldWagesPaid += State.Money;
+                State.Money = 0;
+            }
         }
 
         private void Construction()
