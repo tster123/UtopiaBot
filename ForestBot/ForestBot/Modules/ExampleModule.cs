@@ -1,6 +1,8 @@
-﻿using Discord;
+﻿using System.Runtime.InteropServices.ComTypes;
+using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using ForestLib.Database;
 
 namespace ForestBot.Modules
 {
@@ -122,6 +124,100 @@ namespace ForestBot.Modules
         public async Task GreetUserAsync()
             => await RespondAsync(text: $":ping_pong: It took me {Context.Client.Latency}ms to respond to you!", ephemeral: true);
 
+        public Dictionary<string, string> OpsShortToLong = new Dictionary<string, string>()
+        {
+            ["gp"] = "greater protection",
+            ["sal"] = "salvation",
+            ["mp"] = "minor protection",
+            ["is"] = "illuminate shadows",
+            ["ds"] = "divine shield"
+        };
+        public Dictionary<string, string> OpsLongToShort = new Dictionary<string, string>()
+        {
+            ["greater protection"] = "gp",
+            ["salvation"] = "sal",
+            ["minor protection"] = "mp",
+            ["illuminate shadows"] = "is",
+            ["divine shield"] = "ds"
+        };
+
+        [SlashCommand("whoneeds", "Who in the kingdom needs a support spell")]
+        public async Task WhoNeeds(string spell, bool getRequestFor = false)
+        {
+            try
+            {
+                ForestContext db = new ForestContext();
+                Kingdom? kingdom = db.Kingdoms.SingleOrDefault(k => k.GuildId == 897511707994361866L);
+                if (kingdom == null)
+                {
+                    await RespondAsync("Cannot find a kingdom with guildId: " + Context.Guild.Id);
+                    return;
+                }
+
+                spell = spell.ToLower();
+                string longForm;
+                if (OpsLongToShort.ContainsKey(spell))
+                {
+                    longForm = spell;
+                }
+                else if (OpsShortToLong.TryGetValue(spell, out string? lf))
+                {
+                    longForm = lf;
+                }
+                else
+                {
+                    await RespondAsync("Unknown spell: " + spell);
+                    return;
+                }
+
+                Dictionary<string, DateTime> provEndTimes = new();
+                Dictionary<string, Province> provLookup = new();
+                foreach (Province prov in db.Provinces.Where(p => p.KingdomId == kingdom.KingdomId))
+                {
+                    provEndTimes[prov.Name.ToLower()] = DateTime.MinValue;
+                    provLookup[prov.Name.ToLower()] = prov;
+                }
+
+                foreach (TmOperation op in db.Operations.Where(o => o.Timestamp > DateTime.UtcNow.AddHours(-40) && o.OpName == longForm && o.Success))
+                {
+                    string targetProv = op.TargetProvince ?? op.SourceProvince;
+                    DateTime currentEnd = provEndTimes[targetProv.ToLower()];
+                    DateTime thisEnd = op.Timestamp.AddHours(op.Damage!.Value + 1);
+                    thisEnd = new DateTime(thisEnd.Year, thisEnd.Month, thisEnd.Day, thisEnd.Hour, 0, 0);
+                    if (thisEnd > currentEnd)
+                    {
+                        currentEnd = thisEnd;
+                    }
+
+                    provEndTimes[targetProv.ToLower()] = currentEnd;
+                }
+
+                List<Province> ret = new();
+                foreach (var provAndTime in provEndTimes)
+                {
+                    if (provAndTime.Value < DateTime.UtcNow)
+                    {
+                        ret.Add(provLookup[provAndTime.Key]);
+                    }
+                }
+
+                if (ret.Count == 0)
+                {
+                    await RespondAsync("All provinces are covered with " + longForm);
+                    return;
+                }
+
+                await RespondAsync(string.Join("\n", ret.Select(p => p.Slot + " - " + p.Name)));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+
+        /*
         [SlashCommand("bitrate", "Gets the bitrate of a specific voice channel.")]
         public async Task GetBitrateAsync([ChannelTypes(ChannelType.Voice, ChannelType.Stage)] IChannel channel)
             => await RespondAsync(text: $"This voice channel has a bitrate of {(channel as IVoiceChannel).Bitrate}");
@@ -185,5 +281,6 @@ namespace ForestBot.Modules
                 await RespondAsync(":white_check_mark: Successfully pinned message!");
             }
         }
+        */
     }
 }
