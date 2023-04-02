@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices.ComTypes;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.ComTypes;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -124,22 +125,21 @@ namespace ForestBot.Modules
         public async Task GreetUserAsync()
             => await RespondAsync(text: $":ping_pong: It took me {Context.Client.Latency}ms to respond to you!", ephemeral: true);
 
-        public Dictionary<string, string> OpsShortToLong = new Dictionary<string, string>()
+        public Dictionary<string, string> OpsShortToLong = new()
         {
             ["gp"] = "greater protection",
             ["sal"] = "salvation",
             ["mp"] = "minor protection",
             ["is"] = "illuminate shadows",
-            ["ds"] = "divine shield"
+            ["ds"] = "divine shield",
+            ["pat"] = "patriatism",
+            ["lap"] = "love and peace",
+            ["bb"] = "builders boon",
+            ["ia"] = "inspire army",
+            ["fl"] = "fertile lands"
         };
-        public Dictionary<string, string> OpsLongToShort = new Dictionary<string, string>()
-        {
-            ["greater protection"] = "gp",
-            ["salvation"] = "sal",
-            ["minor protection"] = "mp",
-            ["illuminate shadows"] = "is",
-            ["divine shield"] = "ds"
-        };
+
+        public Dictionary<string, string> OpsLongToShort => OpsShortToLong.ToDictionary(b => b.Value, b => b.Key);
 
         [SlashCommand("whoneeds", "Who in the kingdom needs a support spell")]
         public async Task WhoNeeds(string spell, bool getRequestFor = false)
