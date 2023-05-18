@@ -59,7 +59,7 @@ namespace ForestBot.Modules
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                throw;
+                return 0;
             }
         }
     }

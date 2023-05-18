@@ -15,7 +15,8 @@ public class TestAttackParsing
 :crossed_swords: where life will find a way [**where life will find a wa#**] attacked __Dr Stone__ (3:10)|captured: **13**|loss: **87 Strongarms**|kills: **40**|return: 12.78|15 spec creds|43 peasants|11686off (1 gens)
 :crossed_swords: Hold on to your butts [**hold on to your butt#**] attacked __The Simpsons__ (3:10)|captured: **37**|loss: **93 Skeletons**|kills: **39 (+77 prisoners)**|return: 14.00|83 spec creds|SPREAD PLAGUE|27936off (2 gens)
 :crossed_swords: Therizinosaurus [**therizinosauru#**] attacked __100 oz of laxatives__ (7:4)|learn: **6,382 **|loss: **83 Skeletons and 83 horses**|kills: **46 (+92 prisoners)**|return: 12.35|53856off (2 gens)
-:crossed_swords: and a clever girl [**and a clever gir#**] attacked __Kill the Queen__ (4:3)|plundered: **38,909 gold coins, 81,765 bushels and 26,057 runes**|loss: **89 Skeletons and 89 horses**|kills: **474 (+78 prisoners)**|return: 16.63|SPREAD PLAGUE|58684off (1 gens)";
+:crossed_swords: and a clever girl [**and a clever gir#**] attacked __Kill the Queen__ (4:3)|plundered: **38,909 gold coins, 81,765 bushels and 26,057 runes**|loss: **89 Skeletons and 89 horses**|kills: **474 (+78 prisoners)**|return: 16.63|SPREAD PLAGUE|58684off (1 gens)
+:crossed_swords: ---If U dont do your job--- [**---if u dont do your job--#**] attacked __Udontwannaknow__ (4:1)|captured: **45**|loss: **100 Griffins**|kills: **77 (+65 prisoners)**|return: 12.90|93 spec creds|183 peasants|21434off (2 gens)";
 
     [TestMethod]
     public void TestMethod1()
@@ -29,7 +30,16 @@ public class TestAttackParsing
         Assert.AreEqual(81765, plunder.PlunderFood);
     }
 
-
+    [TestMethod]
+    public void TestElfLords()
+    {
+        string a =
+            @":crossed_swords: The Shawshank Revelation [**the shawshank revelatio#**] attacked __Bento Box Yakult__ (6:10)|captured: **72**|loss: **1 Ranger, 156 Elf Lords and 158 horses**|kills: **196**|return: 11.90|123 spec creds|286 peasants|57052off (2 gens)";
+        BotParser parser = new BotParser();
+        var ret = parser.ParseAttacks(DateTime.UtcNow, 123L, 456L, a);
+        var elfLords = ret[0];
+        Assert.AreEqual(156, elfLords.LostElites);
+    }
 
     [TestMethod]
     public void DatabaseLoader_Attacks()

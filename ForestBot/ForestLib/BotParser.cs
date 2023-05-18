@@ -47,23 +47,24 @@ namespace ForestLib
         // ???? if you know a UNIX system if you know a unix syste#  <<__sloth__ **| Death Note (3:10)**>> __FAIL__ (-3 wizards)|22% guilds (98% BE|2 (m.2.6))|rNW 1.11
         // ???? if you know a UNIX system if you know a unix syste#  <<__sloth__ **| Death Note (3:10)**>> **5**|22% guilds (98% BE|2 (m.2.6))|rNW 1.11
         // ?? Barney the purple dinosaur barney the purple dinosau#  <<__fanaticism__ **| erectopus**>> **6**
+        // :star2::green_heart:  ---I will shoot you myself--- ---i will shoot you myself--- <<__ghost workers__>> **13** | 21% guilds (93% BE (m.19.5))
         private readonly Regex _opRegex = new Regex(
-            @"\?*\s*([\w\- ]+)#  <<__([a-z ]+)__( \*{2}\| (([\w\- ]+)(\((\d+:\d+)\))?)\s*\*{2})?>>(\s*__FAIL__\s*(\(-(\d+)? \w+\))?)?(\s*\*{2}(\d+)\*{2}\s*)?\|?((\d+) sent \([\d\.]*\))?");
+            @"(\?+|(:\w+:)+)\s*([\w\- ]+)#?\s+<<__([a-z ]+)__( \*{2}\| (([\w\- ]+)(\((\d+:\d+)\))?)\s*\*{2})?>>(\s*__FAIL__\s*(\(-(\d+)? \w+\))?)?(\s*\*{2}(\d+)\*{2}\s*)?\|?((\d+) sent \([\d\.]*\))?");
 
         private class TmOpExtractor : IItemExtractor<TmOperation>
         {
             public TmOperation ExtractItem(DateTime timestamp, long guildId, long rawMessageId, Match m, int slot)
             {
-                string opName = m.Groups[2].Value;
-                string provName = m.Groups[1].Value;
+                string opName = m.Groups[4].Value;
+                string provName = m.Groups[3].Value;
                 provName = provName.Substring(0, 1 + (provName.Length / 2)).Trim();
-                string? targetProv = m.Groups[5].Value.Nullify();
-                string? targetKingdom = m.Groups[7].Value.Nullify();
-                string? failString = m.Groups[8].Value.Nullify();
-                string? lost = m.Groups[10].Value.Nullify();
+                string? targetProv = m.Groups[7].Value.Nullify();
+                string? targetKingdom = m.Groups[9].Value.Nullify();
+                string? failString = m.Groups[10].Value.Nullify();
+                string? lost = m.Groups[12].Value.Nullify();
                 if (failString != null && lost == null) lost = "0";
-                string? damage = m.Groups[12].Value.Nullify();
-                string? thievesSent = m.Groups[14].Value.Nullify();
+                string? damage = m.Groups[14].Value.Nullify();
+                string? thievesSent = m.Groups[16].Value.Nullify();
                 return new TmOperation
                 {
                     OpName = opName,
@@ -101,9 +102,10 @@ namespace ForestLib
 :crossed_swords: where life will find a way [**where life will find a wa#**] attacked __Dr Stone__ (3:10)|captured: **13**|loss: **87 Strongarms**|kills: **40**|return: 12.78|15 spec creds|43 peasants|11686off (1 gens)
 :crossed_swords: Therizinosaurus [**therizinosauru#**] attacked __100 oz of laxatives__ (7:4)|learn: **6,382 **|loss: **83 Skeletons and 83 horses**|kills: **46 (+92 prisoners)**|return: 12.35|53856off (2 gens)
 :crossed_swords: and a clever girl [**and a clever gir#**] attacked __Kill the Queen__ (4:3)|plundered: **38,909 gold coins, 81,765 bushels and 26,057 runes**|loss: **89 Skeletons and 89 horses**|kills: **474 (+78 prisoners)**|return: 16.63|SPREAD PLAGUE|58684off (1 gens)
-         */
+:crossed_swords: ---If U dont do your job--- [**---if u dont do your job--#**] attacked __Udontwannaknow__ (4:1)|captured: **45**|loss: **100 Griffins**|kills: **77 (+65 prisoners)**|return: 12.90|93 spec creds|183 peasants|21434off (2 gens)
+        */
         private Regex _attackRegex = new Regex(
-        @":crossed_swords: ([\w -]+)\[\*\*[\w =]*#\*\*\] attacked __([\w -]*)__ \((\d*:\d*)\)\|(\w+):\s+\*\*([^*]*)\s*\*\*\|loss: \*\*([\w\d\s,]+)\*\*\|kills: \*\*(\d+)( \(\+(\d+) prisoners\))?\*\*\|return: ([\d\.]+)\|((\d+) spec creds\|)?((\d+) peasants\|)?(SPREAD PLAGUE\|)?(\d+)off \((\d) gens\)");
+        @":crossed_swords: ([\w -]+)\[\*\*[\w -]*#\*\*\] attacked __([\w -]*)__ \((\d*:\d*)\)\|(\w+):\s+\*\*([^*]*)\s*\*\*\|loss: \*\*([\w\d\s,]+)\*\*\|kills: \*\*(\d+)( \(\+(\d+) prisoners\))?\*\*\|return: ([\d\.]+)\|((\d+) spec creds\|)?((\d+) peasants\|)?(SPREAD PLAGUE\|)?(\d+)off \((\d) gens\)");
 
         private class AttackExtractor : IItemExtractor<Attack>
         {
@@ -186,19 +188,21 @@ namespace ForestLib
 
                 string[] casualtyParts = casualties?.Replace(" and ", ", ").Split(",").Select(s => s.Trim()).ToArray() ?? Array.Empty<string>();
                 int lostSoldiers = 0, lostOSpecs = 0, lostElites = 0, lostHorses = 0;
-                foreach (var casualtyPart in casualtyParts)
+                foreach (var casualtyPartDirty in casualtyParts)
                 {
-                    string[] split = casualtyPart.Trim().Split(" ");
-                    if (split[0] == "1")
+                    string casualtyPart = casualtyPartDirty.Trim();
+                    string numPart = casualtyPart.Substring(0, casualtyPart.IndexOf(" ")).Trim();
+                    string namePart = casualtyPart.Substring(casualtyPart.IndexOf(" ")).Trim();
+                    if (numPart == "1")
                     {
-                        split[1] += "s";
+                        namePart += "s";
                     }
-                    if (!UnitType.TryGetValue(split[1], out string? resolvedType))
+                    if (!UnitType.TryGetValue(namePart, out string? resolvedType))
                     {
-                        throw new ArgumentException("Cannot parse attack.  unrecognized casualty type: " + split[1]);
+                        throw new ArgumentException("Cannot parse attack.  unrecognized casualty type: " + namePart);
                     }
 
-                    int value = int.Parse(split[0]);
+                    int value = int.Parse(numPart);
                     if (resolvedType == "soldier") lostSoldiers = value;
                     else if (resolvedType == "ospec") lostOSpecs = value;
                     else if (resolvedType == "elites") lostElites = value;

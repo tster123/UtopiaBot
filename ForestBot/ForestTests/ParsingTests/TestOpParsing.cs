@@ -37,7 +37,8 @@ namespace ForestTests.ParsingTests
 ????? Sharp Tooth sharp toot#  <<__rob the towers__ **| RedHead Afuro Samurai (2:9)**>> **216**|26 sent (0.06)|1.73 (m.1.73)|rNW 1.19
 ????? Sharp Tooth sharp toot#  <<__spy on throne__ **| Ghost Rider (2:9)**>>|10 sent (0.02)|1.73 (m.1.73)|rNW 1.19
 ????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> __FAIL__ (-2 thieves)|45 sent (0.11)|1.73 (m.1.73)|rNW 1.19
-????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> **321**|45 sent (0.11)|1.73 (m.1.73)|rNW 1.06";
+????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> **321**|45 sent (0.11)|1.73 (m.1.73)|rNW 1.06
+:star2::green_heart:  ---I will shoot you myself--- ---i will shoot you myself--- <<__ghost workers__>> **13** | 21% guilds (93% BE (m.19.5))";
 
         [TestMethod]
         public void TestParse()

@@ -59,7 +59,8 @@ namespace ForestLib.Tools
 
             double draftSpeed = age.DraftEmergency
                                 * (1 + (age.ExpedientDraft * strat.ExpectedExpedientStrength))
-                                * (1 + age.PatriatismBonus);
+                                * (1 + age.PatriatismBonus)
+                                * (1 + strat.AverageDraftSciecne);
             int draftTime = 0;
             double ppa = strat.AveragePeonsPerAcre;
             while (ppa > strat.TargetPeonsPerAcre)

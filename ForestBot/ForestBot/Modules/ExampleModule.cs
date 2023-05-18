@@ -70,7 +70,7 @@ namespace ForestBot.Modules
             => await RespondAsync(echo + (mention ? Context.User.Mention : string.Empty));
 
         [SlashCommand("process-messages", "Reads messages from another channel")]
-        public async Task ProcessMessage(string channel, int lookback = 100, int numMessages = 0, ulong startFromMessageId = 0)
+        public async Task ProcessMessage(string channel, int lookback = 100, int numMessages = 0, string? startFromMessageId = null)
         {
             SocketTextChannel? chan = Context.Guild.TextChannels.FirstOrDefault(c => c.Name.ToLower() == channel);
             if (chan == null)
@@ -79,26 +79,28 @@ namespace ForestBot.Modules
                 return;
             }
             IEnumerable<IMessage> messages;
-            if (startFromMessageId == 0)
+            if (startFromMessageId == null)
             {
                 messages = await chan.GetMessagesAsync(lookback).FlattenAsync();
             }
             else
             {
-                messages = await chan.GetMessagesAsync(startFromMessageId, Direction.Before, lookback).FlattenAsync();
+                messages = await chan.GetMessagesAsync(ulong.Parse(startFromMessageId), Direction.Before, lookback).FlattenAsync();
             }
             MessageHandler handler = new MessageHandler();
             if (numMessages == 0) numMessages = int.MaxValue;
             int processed = 0, saved = 0;
+            ulong? minMessage = null;
             foreach (IMessage m in messages)
             {
                 saved += await handler.MessageReceivedEvent(m);
                 processed++;
                 numMessages--;
+                if (minMessage == null || minMessage.Value > m.Id) minMessage = m.Id;
                 if (numMessages <= 0) break;
             }
 
-            await RespondAsync($"Processed {processed} messages, added {saved} to the DB");
+            await RespondAsync($"Processed {processed} messages, added {saved} to the DB. Min message was {minMessage}");
         }
 
         [SlashCommand("read-messages", "Reads messages from another channel")]
@@ -147,7 +149,7 @@ namespace ForestBot.Modules
             try
             {
                 ForestContext db = new ForestContext();
-                Kingdom? kingdom = db.Kingdoms.SingleOrDefault(k => k.GuildId == 897511707994361866L);
+                Kingdom? kingdom = db.Kingdoms.Where(k => k.GuildId == 897511707994361866L).OrderByDescending(k => k.Age).FirstOrDefault();
                 if (kingdom == null)
                 {
                     await RespondAsync("Cannot find a kingdom with guildId: " + Context.Guild.Id);
