@@ -6,83 +6,82 @@ using Discord.Interactions;
 using ForestBot.Modules;
 using ForestLib;
 
-namespace ForestBot
+namespace ForestBot;
+
+public class Constants
 {
-    public class Constants
-    {
         
-        // To add to a server, go to this URL:
-        // https://discord.com/api/oauth2/authorize?client_id=916794814303981659&permissions=277025491008&scope=bot
+    // To add to a server, go to this URL:
+    // https://discord.com/api/oauth2/authorize?client_id=916794814303981659&permissions=277025491008&scope=bot
+}
+
+public class Program
+{
+    private readonly IConfiguration _configuration;
+    private readonly IServiceProvider _services;
+    private readonly MessageHandler _messageHandler;
+
+    private readonly DiscordSocketConfig _socketConfig = new()
+    {
+        GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent,
+        AlwaysDownloadUsers = true,
+    };
+
+    public Program()
+    {
+        _configuration = new ConfigurationBuilder()
+            .AddEnvironmentVariables(prefix: "DC_")
+            .AddJsonFile("appsettings.json", optional: true)
+            .Build();
+
+        _services = new ServiceCollection()
+            .AddSingleton(_configuration)
+            .AddSingleton(_socketConfig)
+            .AddSingleton<DiscordSocketClient>()
+            .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
+            .AddSingleton<InteractionHandler>()
+            .BuildServiceProvider();
+        _messageHandler = new MessageHandler();
     }
 
-    public class Program
+    static void Main(string[] args)
     {
-        private readonly IConfiguration _configuration;
-        private readonly IServiceProvider _services;
-        private readonly MessageHandler _messageHandler;
+        new Program().RunAsync()
+            .GetAwaiter()
+            .GetResult();
+    }
 
-        private readonly DiscordSocketConfig _socketConfig = new()
-        {
-            GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent,
-            AlwaysDownloadUsers = true,
-        };
+    public async Task RunAsync()
+    {
+        var client = _services.GetRequiredService<DiscordSocketClient>();
 
-        public Program()
-        {
-            _configuration = new ConfigurationBuilder()
-                .AddEnvironmentVariables(prefix: "DC_")
-                .AddJsonFile("appsettings.json", optional: true)
-                .Build();
+        client.Log += LogAsync;
 
-            _services = new ServiceCollection()
-                .AddSingleton(_configuration)
-                .AddSingleton(_socketConfig)
-                .AddSingleton<DiscordSocketClient>()
-                .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
-                .AddSingleton<InteractionHandler>()
-                .BuildServiceProvider();
-            _messageHandler = new MessageHandler();
-        }
+        // Here we can initialize the service that will register and execute our commands
+        await _services.GetRequiredService<InteractionHandler>()
+            .InitializeAsync();
 
-        static void Main(string[] args)
-        {
-            new Program().RunAsync()
-                .GetAwaiter()
-                .GetResult();
-        }
+        client.MessageReceived += _messageHandler.MessageReceivedEvent;
 
-        public async Task RunAsync()
-        {
-            var client = _services.GetRequiredService<DiscordSocketClient>();
+        // Bot token can be provided from the Configuration object we set up earlier
+        await client.LoginAsync(TokenType.Bot, Settings.Instance.DiscordToken);
+        await client.StartAsync();
 
-            client.Log += LogAsync;
-
-            // Here we can initialize the service that will register and execute our commands
-            await _services.GetRequiredService<InteractionHandler>()
-                .InitializeAsync();
-
-            client.MessageReceived += _messageHandler.MessageReceivedEvent;
-
-            // Bot token can be provided from the Configuration object we set up earlier
-            await client.LoginAsync(TokenType.Bot, Settings.Instance.DiscordToken);
-            await client.StartAsync();
-
-            // Never quit the program until manually forced to.
-            await Task.Delay(Timeout.Infinite);
-        }
+        // Never quit the program until manually forced to.
+        await Task.Delay(Timeout.Infinite);
+    }
 
         
 
-        private async Task LogAsync(LogMessage message)
-            => Console.WriteLine(message.ToString());
+    private async Task LogAsync(LogMessage message)
+        => Console.WriteLine(message.ToString());
 
-        public static bool IsDebug()
-        {
+    public static bool IsDebug()
+    {
 #if DEBUG
-            return false;
+        return false;
 #else
                 return false;
 #endif
-        }
     }
 }

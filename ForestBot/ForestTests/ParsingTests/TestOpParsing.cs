@@ -2,13 +2,13 @@
 using ForestLib.Database;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
-namespace ForestTests.ParsingTests
+namespace ForestTests.ParsingTests;
+
+[TestClass]
+public class TestOpParsing
 {
-    [TestClass]
-    public class TestOpParsing
-    {
-        readonly string ops =
-            @"???? Welcome to Jurassic Park welcome to jurassic par#  <<__natures blessing__>> __FAIL__ | 10% guilds (99% BE (m.9.9))
+    readonly string ops =
+        @"???? Welcome to Jurassic Park welcome to jurassic par#  <<__natures blessing__>> __FAIL__ | 10% guilds (99% BE (m.9.9))
 ???? Welcome to Jurassic Park welcome to jurassic par#  <<__natures blessing__>> **14** | 10% guilds (99% BE (m.9.9))
 ???? Welcome to Jurassic Park welcome to jurassic par#  <<__natures blessing__>> __FAIL__ | 10% guilds (99% BE (m.9.9))
 ???? if you know a UNIX system if you know a unix syste#  <<__sloth__ **| Death Note (3:10)**>> __FAIL__ (-3 wizards)|22% guilds (98% BE|2 (m.2.6))|rNW 1.11
@@ -40,45 +40,44 @@ namespace ForestTests.ParsingTests
 ????? Sharp Tooth sharp toot#  <<__rob the towers__ **| Ghost Rider (2:9)**>> **321**|45 sent (0.11)|1.73 (m.1.73)|rNW 1.06
 :star2::green_heart:  ---I will shoot you myself--- ---i will shoot you myself--- <<__ghost workers__>> **13** | 21% guilds (93% BE (m.19.5))";
 
-        [TestMethod]
-        public void TestParse()
-        {
-            BotParser parser = new BotParser();
-            var ret = parser.ParseOps(DateTime.UtcNow, 123L, 456L, ops);
-            Assert.AreEqual("Welcome to Jurassic Park", ret[0].SourceProvince);
-        }
+    [TestMethod]
+    public void TestParse()
+    {
+        BotParser parser = new BotParser();
+        var ret = parser.ParseOps(DateTime.UtcNow, 123L, 456L, ops);
+        Assert.AreEqual("Welcome to Jurassic Park", ret[0].SourceProvince);
+    }
 
 
-        [TestMethod]
-        public void DatabaseLoader_Operations()
+    [TestMethod]
+    public void DatabaseLoader_Operations()
+    {
+        ForestContext db = new ForestContext();
+        var messages = db.RawMessages.Where(m => m.ChannelName == "bot-ops" && m.Source == "Bot").ToList();
+        var parsedMessages = db.Operations.Select(o => o.ParsedFromMessageId).Distinct().ToHashSet();
+        BotParser parser = new BotParser();
+        foreach (var m in messages)
         {
-            ForestContext db = new ForestContext();
-            var messages = db.RawMessages.Where(m => m.ChannelName == "bot-ops" && m.Source == "Bot").ToList();
-            var parsedMessages = db.Operations.Select(o => o.ParsedFromMessageId).Distinct().ToHashSet();
-            BotParser parser = new BotParser();
-            foreach (var m in messages)
+            try
             {
-                try
+                if (parsedMessages.Contains(m.Id))
                 {
-                    if (parsedMessages.Contains(m.Id))
-                    {
-                        continue;
-                    }
-
-                    var ops = parser.ParseOps(m.Timestamp, m.GuildId ?? 0, m.Id, m.MessageContent);
-                    foreach (var op in ops)
-                    {
-                        db.Operations.Add(op);
-                    }
-
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
+                    continue;
                 }
 
+                var ops = parser.ParseOps(m.Timestamp, m.GuildId ?? 0, m.Id, m.MessageContent);
+                foreach (var op in ops)
+                {
+                    db.Operations.Add(op);
+                }
+
+                db.SaveChanges();
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
         }
     }
 }

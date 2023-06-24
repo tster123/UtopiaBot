@@ -5,15 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using ForestLib.AgeSettings.Ages;
 
-namespace ForestLib.Tools
-{
-    public class CeasefireSimulator
-    {
-        private readonly Age100Settings age;
+namespace ForestLib.Tools;
 
-        public CeasefireSimulator(Age100Settings age)
-        {
-            this.age = age;
-        }
+public class CeasefireSimulator
+{
+    private readonly Age100Settings age;
+
+    public CeasefireSimulator(Age100Settings age)
+    {
+        this.age = age;
     }
 }

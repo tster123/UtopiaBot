@@ -3,20 +3,19 @@ using ForestLib.AgeSettings;
 using ForestLib.AgeSettings.Ages;
 using ForestLib.Tools;
 
-namespace ForestTests
+namespace ForestTests;
+
+[TestClass]
+public class CeasefireTimelineTest
 {
-    [TestClass]
-    public class CeasefireTimelineTest
+    [TestMethod]
+    public void TestTimeline()
     {
-        [TestMethod]
-        public void TestTimeline()
+        CeasefireTimeline timeline = new CeasefireTimeline(new Age100Settings(), new StrategySettings());
+        var ret = timeline.GetTimeline(new UtopiaDate(3, 4, 7));
+        foreach (var e in ret)
         {
-            CeasefireTimeline timeline = new CeasefireTimeline(new Age100Settings(), new StrategySettings());
-            var ret = timeline.GetTimeline(new UtopiaDate(3, 4, 7));
-            foreach (var e in ret)
-            {
-                Console.WriteLine(e);
-            }
+            Console.WriteLine(e);
         }
     }
 }

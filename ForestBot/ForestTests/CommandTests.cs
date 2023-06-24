@@ -5,17 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using ForestBot.Modules;
 
-namespace ForestTests
-{
-    [TestClass]
-    public class CommandTests
-    {
+namespace ForestTests;
 
-        [TestMethod]
-        public void TestWhoNeeds()
-        {
-            ExampleModule module = new ExampleModule(null!);
-            module.WhoNeeds("sal");
-        }
+[TestClass]
+public class CommandTests
+{
+
+    [TestMethod]
+    public void TestWhoNeeds()
+    {
+        ExampleModule module = new ExampleModule(null!);
+        module.WhoNeeds("sal");
     }
 }
