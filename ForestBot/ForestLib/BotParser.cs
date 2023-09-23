@@ -103,9 +103,10 @@ public class BotParser
 :crossed_swords: Therizinosaurus [**therizinosauru#**] attacked __100 oz of laxatives__ (7:4)|learn: **6,382 **|loss: **83 Skeletons and 83 horses**|kills: **46 (+92 prisoners)**|return: 12.35|53856off (2 gens)
 :crossed_swords: and a clever girl [**and a clever gir#**] attacked __Kill the Queen__ (4:3)|plundered: **38,909 gold coins, 81,765 bushels and 26,057 runes**|loss: **89 Skeletons and 89 horses**|kills: **474 (+78 prisoners)**|return: 16.63|SPREAD PLAGUE|58684off (1 gens)
 :crossed_swords: ---If U dont do your job--- [**---if u dont do your job--#**] attacked __Udontwannaknow__ (4:1)|captured: **45**|loss: **100 Griffins**|kills: **77 (+65 prisoners)**|return: 12.90|93 spec creds|183 peasants|21434off (2 gens)
+:crossed_swords: Bunny LumberShredders [**bunny lumbershredder#**] attacked __Diagon Alley__ (2:11)|captured: **74**|loss: **68 Elf Lords and 63 horses**|kills: **40 (+60 prisoners)**|return: 10.88|87 spec creds|0 OS promoted|343 peasants|22014off (2 gens)
     */
     private Regex _attackRegex = new Regex(
-        @":crossed_swords: ([\w -]+)\[\*\*[\w -]*#\*\*\] attacked __([\w -]*)__ \((\d*:\d*)\)\|(\w+):\s+\*\*([^*]*)\s*\*\*\|loss: \*\*([\w\d\s,]+)\*\*\|kills: \*\*(\d+)( \(\+(\d+) prisoners\))?\*\*\|return: ([\d\.]+)\|((\d+) spec creds\|)?((\d+) peasants\|)?(SPREAD PLAGUE\|)?(\d+)off \((\d) gens\)");
+        @":crossed_swords: ([\w -]+)\[\*\*[\w -]*#\*\*\] attacked __([\w -]*)__ \((\d*:\d*)\)\|(\w+):\s+\*\*([^*]*)\s*\*\*\|loss: \*\*([\w\d\s,]+)\*\*\|kills: \*\*(\d+)( \(\+(\d+) prisoners\))?\*\*\|return: ([\d\.]+)\|((\d+) spec creds\|)?((\d+) OS promoted\|)?((\d+) peasants\|)?(SPREAD PLAGUE\|)?(\d+)off \((\d) gens\)");
 
     private class AttackExtractor : IItemExtractor<Attack>
     {
@@ -181,10 +182,11 @@ public class BotParser
             string? prisoners = m.Groups[9].Value.Nullify();
             string retHours = m.Groups[10].Value;
             string? specCreds = m.Groups[12].Value.Nullify();
-            string? peasants = m.Groups[14].Value.Nullify();
-            bool spreadPlague = !m.Groups[15].Value.IsNullOrEmpty();
-            string offense = m.Groups[16].Value;
-            string gens = m.Groups[17].Value;
+            string? promotions = m.Groups[14].Value.Nullify();
+            string? peasants = m.Groups[16].Value.Nullify();
+            bool spreadPlague = !m.Groups[17].Value.IsNullOrEmpty();
+            string offense = m.Groups[18].Value;
+            string gens = m.Groups[19].Value;
 
             string[] casualtyParts = casualties?.Replace(" and ", ", ").Split(",").Select(s => s.Trim()).ToArray() ?? Array.Empty<string>();
             int lostSoldiers = 0, lostOSpecs = 0, lostElites = 0, lostHorses = 0;
@@ -234,7 +236,8 @@ public class BotParser
                 Peasants = peasants.ParseInt(),
                 Prisoners = prisoners.ParseInt(),
                 ReturnHours = double.Parse(retHours),
-                SpecCredits = specCreds.ParseInt()
+                SpecCredits = specCreds.ParseInt(),
+                Promotions = promotions.Intify()
             };
         }
     }

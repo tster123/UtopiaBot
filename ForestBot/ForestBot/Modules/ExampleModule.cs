@@ -182,8 +182,8 @@ public class ExampleModule : InteractionModuleBase<SocketInteractionContext>
 
             foreach (TmOperation op in db.Operations.Where(o => o.Timestamp > DateTime.UtcNow.AddHours(-40) && o.OpName == longForm && o.Success))
             {
-                string targetProv = op.TargetProvince ?? op.SourceProvince;
-                DateTime currentEnd = provEndTimes[targetProv.ToLower()];
+                string targetProv = (op.TargetProvince ?? op.SourceProvince).Trim().ToLower();
+                DateTime currentEnd = provEndTimes[targetProv];
                 DateTime thisEnd = op.Timestamp.AddHours(op.Damage!.Value + 1);
                 thisEnd = new DateTime(thisEnd.Year, thisEnd.Month, thisEnd.Day, thisEnd.Hour, 0, 0);
                 if (thisEnd > currentEnd)
@@ -191,7 +191,7 @@ public class ExampleModule : InteractionModuleBase<SocketInteractionContext>
                     currentEnd = thisEnd;
                 }
 
-                provEndTimes[targetProv.ToLower()] = currentEnd;
+                provEndTimes[targetProv] = currentEnd;
             }
 
             List<Province> ret = new();

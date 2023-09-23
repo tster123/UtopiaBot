@@ -16,7 +16,8 @@ public class TestAttackParsing
 :crossed_swords: Hold on to your butts [**hold on to your butt#**] attacked __The Simpsons__ (3:10)|captured: **37**|loss: **93 Skeletons**|kills: **39 (+77 prisoners)**|return: 14.00|83 spec creds|SPREAD PLAGUE|27936off (2 gens)
 :crossed_swords: Therizinosaurus [**therizinosauru#**] attacked __100 oz of laxatives__ (7:4)|learn: **6,382 **|loss: **83 Skeletons and 83 horses**|kills: **46 (+92 prisoners)**|return: 12.35|53856off (2 gens)
 :crossed_swords: and a clever girl [**and a clever gir#**] attacked __Kill the Queen__ (4:3)|plundered: **38,909 gold coins, 81,765 bushels and 26,057 runes**|loss: **89 Skeletons and 89 horses**|kills: **474 (+78 prisoners)**|return: 16.63|SPREAD PLAGUE|58684off (1 gens)
-:crossed_swords: ---If U dont do your job--- [**---if u dont do your job--#**] attacked __Udontwannaknow__ (4:1)|captured: **45**|loss: **100 Griffins**|kills: **77 (+65 prisoners)**|return: 12.90|93 spec creds|183 peasants|21434off (2 gens)";
+:crossed_swords: ---If U dont do your job--- [**---if u dont do your job--#**] attacked __Udontwannaknow__ (4:1)|captured: **45**|loss: **100 Griffins**|kills: **77 (+65 prisoners)**|return: 12.90|93 spec creds|183 peasants|21434off (2 gens)
+:crossed_swords: Bunny LumberShredders [**bunny lumbershredder#**] attacked __Diagon Alley__ (2:11)|captured: **74**|loss: **68 Elf Lords and 63 horses**|kills: **40 (+60 prisoners)**|return: 10.88|87 spec creds|32 OS promoted|343 peasants|22014off (2 gens)";
 
     [TestMethod]
     public void TestMethod1()
@@ -39,6 +40,19 @@ public class TestAttackParsing
         var ret = parser.ParseAttacks(DateTime.UtcNow, 123L, 456L, a);
         var elfLords = ret[0];
         Assert.AreEqual(156, elfLords.LostElites);
+        Assert.IsNull(elfLords.Promotions);
+    }
+
+    [TestMethod]
+    public void TestPromotions()
+    {
+        string a = attacks.Split("\n")[9];
+        BotParser parser = new BotParser();
+        var ret = parser.ParseAttacks(DateTime.UtcNow, 123L, 456L, a);
+        Attack attack = ret[0];
+        Assert.AreEqual(68, attack.LostElites);
+        Assert.AreEqual(32, attack.Promotions);
+
     }
 
     [TestMethod]
@@ -56,7 +70,7 @@ public class TestAttackParsing
                 {
                     continue;
                 }
-                var ops = parser.ParseAttacks(m.Timestamp, m.GuildId ?? 0, m.Id, m.MessageContent);
+                List<Attack> ops = parser.ParseAttacks(m.Timestamp, m.GuildId ?? 0, m.Id, m.MessageContent);
                 foreach (var op in ops)
                 {
                     db.Attacks.Add(op);

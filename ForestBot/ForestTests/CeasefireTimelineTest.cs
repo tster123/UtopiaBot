@@ -12,7 +12,7 @@ public class CeasefireTimelineTest
     public void TestTimeline()
     {
         CeasefireTimeline timeline = new CeasefireTimeline(new Age100Settings(), new StrategySettings());
-        var ret = timeline.GetTimeline(new UtopiaDate(3, 4, 7));
+        var ret = timeline.GetTimeline(new UtopiaDate(2, 5, 3));
         foreach (var e in ret)
         {
             Console.WriteLine(e);

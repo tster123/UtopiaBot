@@ -28,4 +28,5 @@ public class Attack
     public double ReturnHours { get; set; }
     public int OffenseSent { get; set; }
     public int GeneralsSent { get; set; }
+    public int? Promotions { get; set; }
 }
