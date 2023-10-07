@@ -14,7 +14,7 @@ public class CommandTests
     [TestMethod]
     public void TestWhoNeeds()
     {
-        ExampleModule module = new ExampleModule(null!);
+        BotCommands module = new BotCommands(null!);
         module.WhoNeeds("sal");
     }
 }
