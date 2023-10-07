@@ -32,4 +32,14 @@ public class UtopiaDateTest
         AssertDate("Apr 15 Y3", d1.AddTicks(-24));
         AssertDate("May 13 Y2", d1.AddTicks((-24 * 7 - 2)));
     }
+
+    [TestMethod]
+    public void TestParse()
+    {
+        Assert.AreEqual(UtopiaDate.Parse("April 9 of YR2"), new UtopiaDate(2, 4, 9));
+        Assert.AreEqual(UtopiaDate.Parse("Apr 11, YR2"), new UtopiaDate(2, 4, 11));
+        Assert.AreEqual(UtopiaDate.Parse("Jun5YR1"), new UtopiaDate(1, 6, 5));
+        Assert.AreEqual(UtopiaDate.Parse("Feb  5 Y4"), new UtopiaDate(4, 2, 5));
+        Assert.AreEqual(UtopiaDate.Parse("Feb  5 Y4"), new UtopiaDate(4, 2, 5));
+    }
 }

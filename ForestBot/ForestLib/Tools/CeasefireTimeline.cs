@@ -15,6 +15,7 @@ public class TimelineEvent
     }
 
     public override string ToString() => $"{Date} - {Event}";
+    public string UglyString() => $"{Date.UglyString()} - {Event}";
 }
 public class CeasefireTimeline
 {

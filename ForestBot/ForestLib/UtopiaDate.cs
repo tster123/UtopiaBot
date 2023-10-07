@@ -1,4 +1,6 @@
-﻿namespace ForestLib;
+﻿using System.Text.RegularExpressions;
+
+namespace ForestLib;
 
 public class UtopiaDate : IComparable<UtopiaDate>
 {
@@ -24,7 +26,35 @@ public class UtopiaDate : IComparable<UtopiaDate>
         Day = 1 + (tickOfYear % 24);
         Tick = tick;
     }
+
+    /// <summary>
+    /// Parses a utopia date from one of these formats:
+    ///
+    /// April 9 of YR2
+    /// Apr 11, YR2
+    /// Jun5YR1
+    /// Feb  5 Y2
+    /// </summary>
+    /// <param name="date"></param>
+    /// <returns></returns>
+    public static UtopiaDate Parse(string date)
+    {
+        try
+        {
+            Regex r = new Regex("(\\w{3})\\D*(\\d+)\\D+(\\d+)");
+            var m = r.Match(date);
+            if (!m.Success) throw new ApplicationException("Cannot parse utopia date [" + date + "]");
+            int month = 1 + Array.IndexOf(new[] { "jan", "feb", "mar", "apr", "may", "jun", "jul" },
+                m.Groups[1].Value.ToLower());
+            return new UtopiaDate(int.Parse(m.Groups[3].Value), month, int.Parse(m.Groups[2].Value));
+        }
+        catch (Exception e)
+        {
+            throw new ApplicationException("Cannot parse UtopiaDate [" + date + "]", e);
+        }
         
+    }
+
     public override string ToString() => string.Format("{2}{0,3} Y{1}", Day, Year, MonthString());
 
     public string UglyString()

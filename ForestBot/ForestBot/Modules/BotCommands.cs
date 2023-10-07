@@ -1,7 +1,10 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using ForestLib;
+using ForestLib.AgeSettings.Ages;
 using ForestLib.Database;
+using ForestLib.Tools;
 
 namespace ForestBot.Modules;
 
@@ -103,7 +106,7 @@ public class BotCommands : InteractionModuleBase<SocketInteractionContext>
     public Dictionary<string, string> OpsLongToShort => OpsShortToLong.ToDictionary(b => b.Value, b => b.Key);
 
     [SlashCommand("whoneeds", "Who in the kingdom needs a support spell")]
-    public async Task WhoNeeds(string spell, bool getRequestFor = false)
+    public async Task WhoNeeds(string spell)
     {
         try
         {
@@ -173,7 +176,63 @@ public class BotCommands : InteractionModuleBase<SocketInteractionContext>
         catch (Exception e)
         {
             Console.WriteLine(e);
-            throw;
+            await RespondAsync("Error!\n" + e);
+        }
+    }
+
+    [SlashCommand("timeline", "Generates a ceasefire timeline")]
+    public async Task Timeline(
+        string warEndDate,
+        double avgPeonsPerAcre,
+        double targetPeonsPerAcre = 5.5,
+        double avgConstructionScience = 0.0,
+        double avgDraftScience = 0.0,
+        double avgToolsScience = 0.0,
+        double avgTrainingTimeScience = 0.0,
+        double avgProductionScience = 0.0,
+        double expectedExpedientStrength = 1.15,
+        double expectedHasteStrength = 1.15,
+        double ritualCastSuccessRate = 0.80, 
+        int ritualCastsDesired = 7,
+        double ritualBuffer = 0.2,
+        bool uglyString = false
+    )
+    {
+        try
+        {
+            UtopiaDate warEnd = UtopiaDate.Parse(warEndDate);
+            StrategySettings strat = new StrategySettings
+            {
+                AverageConstructionScience = avgConstructionScience,
+                AverageDraftSciecne = avgDraftScience,
+                ToolsScience = avgToolsScience,
+                AveragePeonsPerAcre = avgPeonsPerAcre,
+                AverageTrainingTimeScience = avgTrainingTimeScience,
+                ExpectedExpedientStrength = expectedExpedientStrength,
+                ExpectedHasteStrength = expectedHasteStrength,
+                ProductionScience = avgProductionScience,
+                RitualBuffer = ritualBuffer,
+                RitualCastsDesired = ritualCastsDesired,
+                RitualSuccessRate = ritualCastSuccessRate,
+                TargetHorseFill = 0.9,
+                TargetPeonsPerAcre = targetPeonsPerAcre,
+
+            };
+            CeasefireTimeline timeline = new CeasefireTimeline(new Age103Settings(), strat);
+            List<TimelineEvent> ret = timeline.GetTimeline(warEnd);
+            string retStr = "";
+            foreach (var e in ret)
+            {
+                if (retStr != "") retStr += "\n";
+                retStr += uglyString ? e.UglyString() : e.ToString();
+            }
+
+            await RespondAsync(retStr);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            await RespondAsync("Error!\n" + e);
         }
     }
 
