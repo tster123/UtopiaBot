@@ -26,6 +26,13 @@ public class UtopiaDate : IComparable<UtopiaDate>
     }
         
     public override string ToString() => string.Format("{2}{0,3} Y{1}", Day, Year, MonthString());
+    
+    /*public override string ToString()
+    {
+        string str = string.Format("{2}{0}YR{1}", Day, Year, MonthString());
+        if (Day < 10) str += " ";
+        return str;
+    }*/
 
     public string MonthString()
     {

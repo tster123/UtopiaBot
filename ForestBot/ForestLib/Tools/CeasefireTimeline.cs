@@ -1,4 +1,5 @@
 ﻿using ForestLib.AgeSettings.Ages;
+using ForestLib.State;
 
 namespace ForestLib.Tools;
 
@@ -17,10 +18,10 @@ public class TimelineEvent
 }
 public class CeasefireTimeline
 {
-    private readonly Age100Settings age;
+    private readonly Age103Settings age;
     private readonly StrategySettings strat;
 
-    public CeasefireTimeline(Age100Settings age, StrategySettings strat)
+    public CeasefireTimeline(Age103Settings age, StrategySettings strat)
     {
         this.age = age;
         this.strat = strat;
@@ -37,6 +38,10 @@ public class CeasefireTimeline
                               (1 - strat.ExpectedExpedientStrength * age.ExpedientBuildSpeedBonus) *
                               (1 - strat.AverageConstructionScience) *
                               (1 - age.BuildersBoonSpeedup));
+        int buildTimeWithHaste = (int)(age.BaseBuildTime *
+                              (1 - strat.ExpectedHasteStrength * age.HasteConstructionSpeedBonus) *
+                              (1 - strat.AverageConstructionScience) *
+                              (1 - age.BuildersBoonSpeedup));
 
         // stable build time
         double horsesNeeded = age.StableCapacity * strat.TargetHorseFill;
@@ -44,18 +49,29 @@ public class CeasefireTimeline
         UtopiaDate buildStables = cfEnd.AddTicks(-1 * (buildTime + (int)Math.Round(ticksToFillStables)));
         ret.Add(new TimelineEvent(buildStables, "Build stables (BB + L&P)"));
 
-        ret.Add(new TimelineEvent(cfEnd.AddTicks(-buildTime), "Switch to war build"));
+        ret.Add(new TimelineEvent(cfEnd.AddTicks(-buildTimeWithHaste), "Switch to war build"));
         ret.Add(new TimelineEvent(cfEnd.AddTicks(-49), "Raise wages to 200%"));
 
         // training date
-        int trainingTime = (int)Math.Ceiling(
-            age.BaseTrainingTime
-            * (1 - age.ExpedientTrainSpeedBonus * strat.ExpectedExpedientStrength)
-            * (1 - age.InspireArmyTrainingSpeedBonus)
-            * (1 - strat.AverageTrainingTimeScience));
-        UtopiaDate trainingDate = cfEnd.AddTicks(-trainingTime);
+        double baseTrainingTime = age.BaseTrainingTime
+                                  * (1 - age.HasteTrainingSpeedBonus * strat.ExpectedHasteStrength)
+                                  * (1 - age.InspireArmyTrainingSpeedBonus)
+                                  * (1 - strat.AverageTrainingTimeScience);
+        int trainingTicks = (int)Math.Ceiling(baseTrainingTime);
+        UtopiaDate trainingDate = cfEnd.AddTicks(-trainingTicks);
         ret.Add(new TimelineEvent(trainingDate, $"Last date to start training (w/ IA  & {strat.AverageTrainingTimeScience:P} valor science)"));
+        ret.Add(new TimelineEvent(trainingDate.AddTicks(-5), $"Estimated start of haste ritual"));
         ret.Add(new TimelineEvent(trainingDate.AddTicks(-buildTime), "Latest build 25-30% arms (w/ BB)"));
+
+        foreach (Race r in age.Races)
+        {
+            if (Math.Abs(r.TrainingTime - 1) > 0.01)
+            {
+                int raceTrainingTicks = (int)Math.Ceiling(baseTrainingTime * r.TrainingTime);
+                UtopiaDate raceTrainingDate = cfEnd.AddTicks(-raceTrainingTicks);
+                ret.Add(new TimelineEvent(raceTrainingDate, r.Name + $" Only - Last date to start training (w/ IA  & {strat.AverageTrainingTimeScience:P} valor science)"));
+            }
+        }
 
         double draftSpeed = age.DraftEmergency
                             * (1 + (age.ExpedientDraft * strat.ExpectedExpedientStrength))
@@ -69,8 +85,8 @@ public class CeasefireTimeline
             draftTime++;
         }
 
-        ret.Add(new TimelineEvent(trainingDate.AddTicks(-draftTime),
-            $"Start draft for full train from {strat.AveragePeonsPerAcre} PPA"));
+        ret.Add(new TimelineEvent(trainingDate.AddTicks(-draftTime - 1),
+            $"Calculate your draft start time"));
         UtopiaDate ritualPopDate = trainingDate.AddTicks(-draftTime - 2);
         ret.Add(new TimelineEvent(ritualPopDate,
             "Last date to activate Expedient"));

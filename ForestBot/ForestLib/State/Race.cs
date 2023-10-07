@@ -14,6 +14,7 @@ public class Race
     public double BuildingCost = 1;
     public bool AllowAccelerateConstruction = true;
     public double ConstructionTime = 1;
+    public double TrainingTime = 1;
 
     public Race(string name)
     {

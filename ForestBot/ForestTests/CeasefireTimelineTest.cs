@@ -11,8 +11,8 @@ public class CeasefireTimelineTest
     [TestMethod]
     public void TestTimeline()
     {
-        CeasefireTimeline timeline = new CeasefireTimeline(new Age100Settings(), new StrategySettings());
-        var ret = timeline.GetTimeline(new UtopiaDate(2, 5, 3));
+        CeasefireTimeline timeline = new CeasefireTimeline(new Age103Settings(), new StrategySettings());
+        var ret = timeline.GetTimeline(new UtopiaDate(1, 6, 5));
         foreach (var e in ret)
         {
             Console.WriteLine(e);
