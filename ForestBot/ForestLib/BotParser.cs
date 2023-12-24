@@ -106,7 +106,7 @@ public class BotParser
 :crossed_swords: Bunny LumberShredders [**bunny lumbershredder#**] attacked __Diagon Alley__ (2:11)|captured: **74**|loss: **68 Elf Lords and 63 horses**|kills: **40 (+60 prisoners)**|return: 10.88|87 spec creds|0 OS promoted|343 peasants|22014off (2 gens)
     */
     private Regex _attackRegex = new Regex(
-        @":crossed_swords: ([\w -]+)\[\*\*[\w -]*#\*\*\] attacked __([\w -]*)__ \((\d*:\d*)\)\|(\w+):\s+\*\*([^*]*)\s*\*\*\|loss: \*\*([\w\d\s,]+)\*\*\|kills: \*\*(\d+)( \(\+(\d+) prisoners\))?\*\*\|return: ([\d\.]+)\|((\d+) spec creds\|)?((\d+) OS promoted\|)?((\d+) peasants\|)?(SPREAD PLAGUE\|)?(\d+)off \((\d) gens\)");
+        @":crossed_swords: ([\w -]+)\[\*\*[\w -]*#\*\*\] attacked __([\w -]*)__ \((\d*:\d*)\)\|(\w+):\s+\*\*([^*]*)\s*\*\*\|loss: \*\*([\w\d\s,]+)\*\*\|kills: \*\*(\d+)( \(\+(\d+) prisoners\))?\*\*\|return: ([\d\.]+)\|((\d+) spec creds\|)?(([\d,]+) OS promoted\|)?(([\d,]+) peasants\|)?(SPREAD PLAGUE\|)?(\d+)off \((\d) gens\)");
 
     private class AttackExtractor : IItemExtractor<Attack>
     {
@@ -119,15 +119,19 @@ public class BotParser
             ["Strongarms"] = "ospec",
             ["Swordsmen"] = "ospec",
             ["Goblins"] = "ospec",
+            ["Quickblades"] = "ospec",
             ["Skeletons"] = "ospec",
+            ["Night Rangers"] = "ospec",
             ["Drakes"] = "elites",
             ["Berserkers"] = "elites",
             ["Elf Lords"] = "elites",
             ["Beastmasters"] = "elites",
             ["Brutes"] = "elites",
             ["Knights"] = "elites",
+            ["Drows"] = "elites",
             ["Ogres"] = "elites",
             ["Ghouls"] = "elites",
+            ["Golems"] = "elites",
             ["soldiers"] = "soldiers",
             ["horses"] = "horses"
         };
