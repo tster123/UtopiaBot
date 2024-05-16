@@ -46,9 +46,7 @@ public class Program
 
     static void Main(string[] args)
     {
-        new Program().RunAsync()
-            .GetAwaiter()
-            .GetResult();
+        new Program().RunAsync().GetAwaiter().GetResult();
     }
 
     public async Task RunAsync()
@@ -64,8 +62,10 @@ public class Program
         client.MessageReceived += _messageHandler.MessageReceivedEvent;
 
         // Bot token can be provided from the Configuration object we set up earlier
-        await client.LoginAsync(TokenType.Bot, Settings.Instance.DiscordToken);
-        await client.StartAsync();
+        //await client.LoginAsync(TokenType.Bot, Settings.Instance.DiscordToken);
+        //await client.StartAsync();
+
+        Task endpointTask = new IntelEndpoint().StartEndpointAsync(80);
 
         // Never quit the program until manually forced to.
         await Task.Delay(Timeout.Infinite);

@@ -218,8 +218,8 @@ public class BotCommands : InteractionModuleBase<SocketInteractionContext>
                 TargetPeonsPerAcre = targetPeonsPerAcre,
 
             };
-            CeasefireTimeline timeline = new CeasefireTimeline(new Age103Settings(), strat);
-            List<TimelineEvent> ret = timeline.GetTimeline(warEnd);
+            CeasefireTimeline timeline = new CeasefireTimeline(new Age105Settings(), strat);
+            List<TimelineEvent> ret = timeline.GetTimelineWithExpedientAndHaste(warEnd);
             string retStr = "";
             foreach (var e in ret)
             {

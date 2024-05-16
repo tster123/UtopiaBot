@@ -1,0 +1,8 @@
+﻿@UtopiaListener_HostAddress = https://localhost:80
+
+POST {{UtopiaListener_HostAddress}}/Intel
+Content-Type: application/json
+
+"string"
+
+###

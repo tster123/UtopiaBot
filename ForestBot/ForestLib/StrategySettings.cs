@@ -16,7 +16,7 @@ public class StrategySettings
     public double RitualCastsDesired = 7;
     public double RitualBuffer = .2;
 
-    public double    AveragePeonsPerAcre = 17,
+    public double    AveragePeonsPerAcre = 18,
         TargetPeonsPerAcre = 6;
 
 }
