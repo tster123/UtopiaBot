@@ -236,6 +236,47 @@ public class BotCommands : InteractionModuleBase<SocketInteractionContext>
         }
     }
 
+    [SlashCommand("calculate-be", "Calculates what your BE will be based on various inputs")]
+    public async Task CalculateBe(
+        int peasants = -1,
+        int prisoners = 0,
+        int availableJobs = -1,
+        int acres = -1,
+        double percentageHomes = -1,
+        double toolsScienceBonus = 0,
+        bool dwarf = false)
+    {
+        if (toolsScienceBonus > .5)
+        {
+            await RespondAsync("toolsScienceBonus most be between 0.0 and 0.5");
+            return;
+        }
+
+        if (availableJobs <= 0)
+        {
+            if (acres <= 0 || percentageHomes < 0)
+            {
+                await RespondAsync("Must provide either availableJobs or acres & percentageHomes");
+                return;
+            }
+
+            if (percentageHomes < 0 || percentageHomes > 1)
+            {
+                await RespondAsync("percentageHomes most be between 0.0 and 1.0");
+                return;
+            }
+
+            availableJobs = (int)(acres * (1 - percentageHomes) * 25.0);
+        }
+
+        int availWorkers = peasants + prisoners / 2;
+        int optimalWorkers = (int)(availableJobs * 0.67);
+        double jobsPerformed = Math.Min(1, 1.0 * availWorkers / optimalWorkers);
+        double race = dwarf ? 1.3 : 1.0;
+        double be = (0.5 * (1.0 + jobsPerformed)) * race * (1.0 + toolsScienceBonus);
+        await RespondAsync($"BE = {be:P} (workers = {availWorkers}, optimalWorkers={optimalWorkers})");
+    }
+
 
     /*
     [SlashCommand("bitrate", "Gets the bitrate of a specific voice channel.")]

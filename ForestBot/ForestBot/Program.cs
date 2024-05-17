@@ -62,10 +62,10 @@ public class Program
         client.MessageReceived += _messageHandler.MessageReceivedEvent;
 
         // Bot token can be provided from the Configuration object we set up earlier
-        //await client.LoginAsync(TokenType.Bot, Settings.Instance.DiscordToken);
-        //await client.StartAsync();
+        await client.LoginAsync(TokenType.Bot, Settings.Instance.DiscordToken);
+        await client.StartAsync();
 
-        Task endpointTask = new IntelEndpoint().StartEndpointAsync(80);
+        //Task endpointTask = new IntelEndpoint().StartEndpointAsync(80);
 
         // Never quit the program until manually forced to.
         await Task.Delay(Timeout.Infinite);
