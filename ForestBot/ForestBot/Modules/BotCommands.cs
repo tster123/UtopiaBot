@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using System.Text;
+using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using ForestLib;
@@ -275,6 +276,75 @@ public class BotCommands : InteractionModuleBase<SocketInteractionContext>
         double race = dwarf ? 1.3 : 1.0;
         double be = (0.5 * (1.0 + jobsPerformed)) * race * (1.0 + toolsScienceBonus);
         await RespondAsync($"BE = {be:P} (workers = {availWorkers}, optimalWorkers={optimalWorkers})");
+    }
+
+    [SlashCommand("activity-times", "Shows the number of active hours (UTC) for a province over the time range (default last 30 days)")]
+    public async Task ProvinceActivityTimes(string province, DateTime? start = null, DateTime? end = null, int utcOffset = 0)
+    {
+        try
+        {
+            ForestContext db = new ForestContext();
+            start ??= DateTime.UtcNow.Subtract(TimeSpan.FromDays(30));
+            end ??= DateTime.UtcNow;
+            end = end.Value.AddDays(1).Date;
+            start = start.Value.Date;
+
+            var union = (
+                    from a in db.Attacks
+                    where a.Timestamp > start.Value && a.Timestamp <= end.Value && a.SourceProvince == province
+                    select new { a.Timestamp.Hour, a.Timestamp.Date })
+                .Union(
+                    from o in db.Operations
+                    where o.Timestamp > start.Value && o.Timestamp <= end.Value && o.SourceProvince == province
+                    select new { o.Timestamp.Hour, o.Timestamp.Date }
+                );
+
+            var res = from i in union
+                group i by i.Hour into g
+                select new { Hour = g.Key, Uniques = g.Select(ga => ga.Date).Distinct().Count() };
+            int[] counts = new int[24];
+            double max = 0;
+            foreach (var r in res)
+            {
+                counts[r.Hour] = r.Uniques;
+                max = Math.Max(max, r.Uniques);
+            }
+
+            StringBuilder m = new StringBuilder(500);
+            m.AppendLine("```");
+            int absOffset = Math.Abs(utcOffset);
+            string localLabel;
+            if (absOffset == 0)
+                localLabel = "UTC";
+            else if (utcOffset < 0)
+                localLabel = "UTC" + utcOffset;
+            else
+                localLabel = "UTC+" + utcOffset;
+
+            m.AppendLine(localLabel + " (uto date) : unique days with activity");
+            for (int localHour = 0; localHour < 24; localHour++)
+            {
+                int utcHour = (24 + (localHour - utcOffset)) % 24;
+                int utopiaDate = ((utcHour + 6) % 24) + 1;
+                m.Append($"{localHour.ToString().PadLeft(2)} ({utopiaDate.ToString().PadLeft(2)}) : {counts[utcHour].ToString().PadLeft(3)} ");
+                double percentage = counts[utcHour] / max;
+                int size = (int)(25 * percentage);
+                while (size > 0)
+                {
+                    size--;
+                    m.Append("#");
+                }
+                m.AppendLine();
+            }
+            m.AppendLine("```");
+            await RespondAsync(m.ToString());
+
+        }
+        catch (Exception e)
+        {
+            await RespondAsync("Error!\n" + e.Message);
+            Console.WriteLine(e);
+        }
     }
 
 
