@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -101,7 +102,26 @@ public class BotCommands : InteractionModuleBase<SocketInteractionContext>
         ["lap"] = "love and peace",
         ["bb"] = "builders boon",
         ["ia"] = "inspire army",
-        ["fl"] = "fertile lands"
+        ["fl"] = "fertile lands",
+        ["chas"] = "chastity",
+        ["bg"] = "bribe generals",
+        ["fb"] = "fireball",
+        ["infiltrate"] = "infiltrate thieves guild",
+        ["rob t"] = "rob the towers",
+        ["rob v"] = "rob the vaults",
+        ["rob g"] = "rob the granaries",
+        ["sod"] = "spy on defense",
+        ["sot"] = "spy on throne",
+        ["som"] = "spy on military",
+        ["ir"] = "incite riots",
+        ["ms"] = "meteor showers",
+        ["ll"] = "land lush",
+        ["bt"] = "bribe thieves",
+        ["cb"] = "crystal ball",
+        ["pf"] = "pitfalls",
+        ["nm"] = "nightmare",
+        ["ns"] = "night strike",
+        ["mv"] = "mystic vortex",
     };
 
     public Dictionary<string, string> OpsLongToShort => OpsShortToLong.ToDictionary(b => b.Value, b => b.Key);
@@ -345,6 +365,150 @@ public class BotCommands : InteractionModuleBase<SocketInteractionContext>
             await RespondAsync("Error!\n" + e.Message);
             Console.WriteLine(e);
         }
+    }
+
+    [SlashCommand("damage-summary", "Shows damage summary (default last 24 hours).  Use start/end (try '3 days ago' or '2025-01-03')")]
+    public async Task DamageSummary(string sourceProvince = null, string targetProvince = null, string start = null, string end = null, string targetKingdom = null, string opType = null)
+    {
+        DateTime startDt;
+        DateTime? endDt;
+
+        try
+        {
+            startDt = ParseFriendlyDatetime(start, nameof(start)) ?? DateTime.UtcNow.AddDays(-1);
+            endDt = ParseFriendlyDatetime(end, nameof(end));
+        }
+        catch (Exception e)
+        {
+            await RespondAsync(e.Message);
+            return;
+        }
+
+        await DamageSummary(startDt, endDt, sourceProvince, targetProvince, targetKingdom, opType);
+    }
+
+    private DateTime? ParseFriendlyDatetime(string str, string paramName)
+    {
+        if (str == null || str.Trim() == "") return null;
+        string originalStr = str;
+        if (str.ToLower().EndsWith("ago"))
+        {
+            str = str.Replace("ago", "").Trim();
+            string[] parts = str.Split(' ');
+            if (parts.Length != 2)
+            {
+                throw new InvalidOperationException($"Invalid number of tokens in {paramName} parameter.  Expected something like '3.5 days ago'");
+            }
+
+            if (!double.TryParse(parts[0], out double num))
+            {
+                throw new InvalidOperationException($"First part of {paramName} parameter expected to be a number.  Expected something like '3.5 days ago'");
+            }
+
+            string datepart = parts[1];
+            if (datepart.EndsWith("s")) datepart = datepart.Substring(0, datepart.Length - 1);
+            switch (datepart.ToLower())
+            {
+                case "day":
+                    return DateTime.UtcNow.AddDays(-1 * num);
+                case "hour":
+                    return DateTime.UtcNow.AddHours(-1 * num);
+                case "week":
+                    return DateTime.UtcNow.AddDays(-7 * num);
+                case "minute":
+                    return DateTime.UtcNow.AddMinutes(-1 * num);
+                default:
+                    throw new InvalidOperationException($"In {paramName} Don't recognize {parts[1]} as a length of time.  Try one of: days, hours, weeks, or minutes");
+            }
+        }
+
+        if (DateTime.TryParseExact(str, "o", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime res))
+            return res;
+        if (DateTime.TryParseExact(str, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out res))
+            return res;
+        if (DateTime.TryParseExact(str, "yyyy-MM-dd hh:mm", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out res))
+            return res;
+        if (DateTime.TryParseExact(str, "yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out res))
+            return res;
+
+        throw new InvalidOperationException($"cannot parse {paramName}: [{originalStr}]");
+    }
+
+    private async Task DamageSummary(DateTime start, DateTime? end, string sourceProvince, string targetProvince, string targetKingdom, string opType)
+    {
+        if (opType != null)
+        {
+            opType = opType.ToLower();
+            if (opType == "attacks") opType = "attack";
+            if (opType == "ops") opType = "op";
+        }
+        try
+        {
+            ForestContext db = new ForestContext();
+            var union = (
+                    from a in db.Attacks
+                    where a.Timestamp > start &&
+                          (end == null || a.Timestamp <= end.Value) &&
+                          (sourceProvince == null || a.SourceProvince == sourceProvince) &&
+                          (targetProvince == null || a.TargetProvince == targetProvince) &&
+                          (targetKingdom == null || a.TargetKingdom == targetKingdom) &&
+                          (opType == null || opType == "attack" || opType == a.AttackType)
+                    group a by a.AttackType
+                    into g
+                    select new
+                    {
+                        OpType = "attack-" + g.Key,
+                        Damage = g.Sum(a => a.Damage),
+                        Kills = g.Sum(a => a.Kills),
+                        Count = g.Count(),
+                        Success = g.Count(a => a.Damage > 0)
+                    })
+                .Union(
+                    from a in db.Operations
+                    where a.Timestamp > start &&
+                          (end == null || a.Timestamp <= end.Value) &&
+                          (sourceProvince == null || a.SourceProvince == sourceProvince) &&
+                          (targetProvince == null || a.TargetProvince == targetProvince) &&
+                          a.TargetKingdom != null &&
+                          (targetKingdom == null || a.TargetKingdom == targetKingdom) &&
+                          (opType == null || opType == "op" || opType == a.OpName)
+                    group a by a.OpName
+                    into g
+                    select new
+                    {
+                        OpType = g.Key,
+                        Damage = g.Sum(o => o.Damage ?? 0),
+                        Kills = 0,
+                        Count = g.Count(),
+                        Success = g.Count(o => o.Success)
+                    }
+                );
+            StringBuilder m = new StringBuilder(500);
+            m.AppendLine("```");
+            m.AppendLine($"Op Type    | Count | Success |  Damage  | Kills (attack only)");
+            foreach (var line in union)
+            {
+                if (!OpsLongToShort.TryGetValue(line.OpType, out string opName))
+                    opName = line.OpType;
+                opName = opName.Replace("propaganda", "prop");
+                opName = opName.Replace("greater arson", "ga");
+                opName = opName.Replace("soldiers", "sold");
+                opName = opName.Replace("specialist", "spec");
+                opName = opName.Replace("wizards", "wiz");
+                opName = opName.Replace("watch towers", "wt");
+                int damage = opName == "sod" ? 0 : line.Damage;
+                m.AppendLine($"{opName,10} | {line.Count,5:N0} | {line.Success,5:N0} | {damage,6:N0}" + ((line.Kills == 0) ? "" : $" | {line.Kills,6:N0}"));
+            }
+            m.AppendLine("```");
+            await RespondAsync(m.ToString());
+
+        }
+        catch (Exception e)
+        {
+            await RespondAsync("Error!\n" + e.Message);
+            Console.WriteLine(e);
+        }
+        
     }
 
 
