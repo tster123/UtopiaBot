@@ -18,7 +18,9 @@ public class TestAttackParsing
 :crossed_swords: and a clever girl [**and a clever gir#**] attacked __Kill the Queen__ (4:3)|plundered: **38,909 gold coins, 81,765 bushels and 26,057 runes**|loss: **89 Skeletons and 89 horses**|kills: **474 (+78 prisoners)**|return: 16.63|SPREAD PLAGUE|58684off (1 gens)
 :crossed_swords: ---If U dont do your job--- [**---if u dont do your job--#**] attacked __Udontwannaknow__ (4:1)|captured: **45**|loss: **100 Griffins**|kills: **77 (+65 prisoners)**|return: 12.90|93 spec creds|183 peasants|21434off (2 gens)
 :crossed_swords: Bunny LumberShredders [**bunny lumbershredder#**] attacked __Diagon Alley__ (2:11)|captured: **74**|loss: **68 Elf Lords and 63 horses**|kills: **40 (+60 prisoners)**|return: 10.88|87 spec creds|32 OS promoted|343 peasants|22014off (2 gens)
-:crossed_swords: Black tooth beech [**black tooth beec#**] attacked __Took me to 6 flags__ (5:1)|captured: **127**|loss: **328 Rangers and 328 horses**|kills: **226**|return: 11.90|492 spec creds|1,184 OS promoted|2,213 peasants|126358off (1 gens)";
+:crossed_swords: Black tooth beech [**black tooth beec#**] attacked __Took me to 6 flags__ (5:1)|captured: **127**|loss: **328 Rangers and 328 horses**|kills: **226**|return: 11.90|492 spec creds|1,184 OS promoted|2,213 peasants|126358off (1 gens)
+:crossed_swords: Baobab Tree [**baobab tre#**] attacked __Bruce Pollos Hermanos__ (5:12)|captured: **319**|loss: **699 Strongarms, 388 Brutes and 1,088 horses**|kills: **702 (+75 prisoners)**|return: 12.56|1175 spec creds|676 peasants|224462off (3 gens)
+:crossed_swords: PalmTree [**palmtre#**] attacked __SUM__ (5:2)|captured: **137**|loss: **no troops or horses**|kills: **261 (+105 prisoners)**|return: 8.54|357 spec creds|115434off (2 gens)";
 
     [TestMethod]
     public void CommaInPromosAndPeons()

@@ -9,6 +9,7 @@ public class TestOpParsing
 {
     readonly string ops =
         @"???? Welcome to Jurassic Park welcome to jurassic par#  <<__natures blessing__>> __FAIL__ | 10% guilds (99% BE (m.9.9))
+:comet::broken_heart: High Treeson high treeso#  <<__pitfalls__ **| VLOOKUppercut (5:2)**>> __FAIL__ __REFLECTED (8)__|10.4% guilds (92% BE|2.12 (m.5.27)) vs 2.07 (m.3.02)|rNW 1.05
 ???? Welcome to Jurassic Park welcome to jurassic par#  <<__natures blessing__>> **14** | 10% guilds (99% BE (m.9.9))
 ???? Welcome to Jurassic Park welcome to jurassic par#  <<__natures blessing__>> __FAIL__ | 10% guilds (99% BE (m.9.9))
 ???? if you know a UNIX system if you know a unix syste#  <<__sloth__ **| Death Note (3:10)**>> __FAIL__ (-3 wizards)|22% guilds (98% BE|2 (m.2.6))|rNW 1.11
@@ -46,6 +47,9 @@ public class TestOpParsing
         BotParser parser = new BotParser();
         var ret = parser.ParseOps(DateTime.UtcNow, 123L, 456L, ops);
         Assert.AreEqual("Welcome to Jurassic Park", ret[0].SourceProvince);
+        Assert.AreEqual(false, ret[1].Success);
+        Assert.AreEqual(true, ret[1].Reflected);
+        Assert.AreEqual(8, ret[1].Damage);
     }
 
 
@@ -56,6 +60,7 @@ public class TestOpParsing
         var messages = db.RawMessages.Where(m => m.ChannelName == "bot-ops" && m.Source == "Bot").ToList();
         var parsedMessages = db.Operations.Select(o => o.ParsedFromMessageId).Distinct().ToHashSet();
         BotParser parser = new BotParser();
+        int inserts = 0;
         foreach (var m in messages)
         {
             try
@@ -71,13 +76,13 @@ public class TestOpParsing
                     db.Operations.Add(op);
                 }
 
-                db.SaveChanges();
+                inserts += db.SaveChanges();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
-
         }
+        Console.WriteLine("Inserts: " + inserts);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Text;
+using System.Text.RegularExpressions;
 using ForestLib.Database;
 using ForestLib.KewlStuff;
 using Microsoft.EntityFrameworkCore.Query;
@@ -20,7 +21,7 @@ public class BotParser
         foreach (string l in message.Split("\n"))
         {
             slot++;
-            string line = l.Trim();
+            string line = StringUtil.UncommaNumbers(l.Trim());
             Match m = regex.Match(line);
             if (!m.Success)
             {
@@ -48,8 +49,9 @@ public class BotParser
     // ???? if you know a UNIX system if you know a unix syste#  <<__sloth__ **| Death Note (3:10)**>> **5**|22% guilds (98% BE|2 (m.2.6))|rNW 1.11
     // ?? Barney the purple dinosaur barney the purple dinosau#  <<__fanaticism__ **| erectopus**>> **6**
     // :star2::green_heart:  ---I will shoot you myself--- ---i will shoot you myself--- <<__ghost workers__>> **13** | 21% guilds (93% BE (m.19.5))
+    // :comet::broken_heart: High Treeson high treeso#  <<__pitfalls__ **| VLOOKUppercut (5:2)**>> __FAIL__ __REFLECTED (8)__|10.4% guilds (92% BE|2.12 (m.5.27)) vs 2.07 (m.3.02)|rNW 1.05
     private readonly Regex _opRegex = new Regex(
-        @"(\?+|(:\w+:)+)\s*([\w\- ]+)#?\s+<<__([a-z ]+)__( \*{2}\| (([\w\- ]+)(\((\d+:\d+)\))?)\s*\*{2})?>>(\s*__FAIL__\s*(\(-(\d+)? \w+\))?)?(\s*\*{2}(\d+)\*{2}\s*)?\|?((\d+) sent \([\d\.]*\))?");
+        @"(\?+|(:\w+:)+)\s*([\w\- ]+)#?\s+<<__([a-z ]+)__( \*{2}\| (([\w\- ]+)(\((\d+:\d+)\))?)\s*\*{2})?>>(\s*__FAIL__\s*(\(-(\d+)? \w+\))?(__REFLECTED\s*\((\d+)\)__)?)?(\s*\*{2}(\d+)\*{2}\s*)?\|?((\d+) sent \([\d\.]*\))?");
 
     private class TmOpExtractor : IItemExtractor<TmOperation>
     {
@@ -61,10 +63,13 @@ public class BotParser
             string? targetProv = m.Groups[7].Value.Nullify();
             string? targetKingdom = m.Groups[9].Value.Nullify();
             string? failString = m.Groups[10].Value.Nullify();
+            string? reflectedString = m.Groups[13].Value.Nullify();
+            string? reflectedDamage = m.Groups[14].Value.Nullify();
             string? lost = m.Groups[12].Value.Nullify();
             if (failString != null && lost == null) lost = "0";
-            string? damage = m.Groups[14].Value.Nullify();
-            string? thievesSent = m.Groups[16].Value.Nullify();
+            string? damage = m.Groups[16].Value.Nullify();
+            string? thievesSent = m.Groups[18].Value.Nullify();
+            if (damage == null && reflectedDamage != null) damage = reflectedDamage;
             return new TmOperation
             {
                 OpName = opName,
@@ -79,7 +84,7 @@ public class BotParser
                 ParsedFromMessageId = rawMessageId,
                 Timestamp = timestamp,
                 TimestampSlot = slot,
-                Reflected = false
+                Reflected = reflectedString != null
             };
         }
     }
@@ -104,6 +109,8 @@ public class BotParser
 :crossed_swords: and a clever girl [**and a clever gir#**] attacked __Kill the Queen__ (4:3)|plundered: **38,909 gold coins, 81,765 bushels and 26,057 runes**|loss: **89 Skeletons and 89 horses**|kills: **474 (+78 prisoners)**|return: 16.63|SPREAD PLAGUE|58684off (1 gens)
 :crossed_swords: ---If U dont do your job--- [**---if u dont do your job--#**] attacked __Udontwannaknow__ (4:1)|captured: **45**|loss: **100 Griffins**|kills: **77 (+65 prisoners)**|return: 12.90|93 spec creds|183 peasants|21434off (2 gens)
 :crossed_swords: Bunny LumberShredders [**bunny lumbershredder#**] attacked __Diagon Alley__ (2:11)|captured: **74**|loss: **68 Elf Lords and 63 horses**|kills: **40 (+60 prisoners)**|return: 10.88|87 spec creds|0 OS promoted|343 peasants|22014off (2 gens)
+:crossed_swords: Baobab Tree [**baobab tre#**] attacked __Bruce Pollos Hermanos__ (5:12)|captured: **319**|loss: **699 Strongarms, 388 Brutes and 1,088 horses**|kills: **702 (+75 prisoners)**|return: 12.56|1175 spec creds|676 peasants|224462off (3 gens)
+:crossed_swords: PalmTree [**palmtre#**] attacked __SUM__ (5:2)|captured: **137**|loss: **no troops or horses**|kills: **261 (+105 prisoners)**|return: 8.54|357 spec creds|115434off (2 gens)
     */
     private Regex _attackRegex = new Regex(
         @":crossed_swords: ([\w -]+)\[\*\*[\w -]*#\*\*\] attacked __([\w -]*)__ \((\d*:\d*)\)\|(\w+):\s+\*\*([^*]*)\s*\*\*\|loss: \*\*([\w\d\s,]+)\*\*\|kills: \*\*(\d+)( \(\+(\d+) prisoners\))?\*\*\|return: ([\d\.]+)\|((\d+) spec creds\|)?(([\d,]+) OS promoted\|)?(([\d,]+) peasants\|)?(SPREAD PLAGUE\|)?(\d+)off \((\d) gens\)");
@@ -192,7 +199,15 @@ public class BotParser
             string offense = m.Groups[18].Value;
             string gens = m.Groups[19].Value;
 
-            string[] casualtyParts = casualties?.Replace(" and ", ", ").Split(",").Select(s => s.Trim()).ToArray() ?? Array.Empty<string>();
+            string[] casualtyParts;
+            if (casualties != null && casualties == "no troops or horses")
+            {
+                casualtyParts = [];
+            }
+            else
+            {
+                casualtyParts = casualties?.Replace(" and ", ", ").Split(",").Select(s => s.Trim()).ToArray() ?? [];
+            }
             int lostSoldiers = 0, lostOSpecs = 0, lostElites = 0, lostHorses = 0;
             foreach (var casualtyPartDirty in casualtyParts)
             {
@@ -251,5 +266,31 @@ public class BotParser
     public List<Attack> ParseAttacks(DateTime timestamp, long guildId, long rawMessageId, string message)
     {
         return ParseMessages(_attackRegex, _attackExtractor, timestamp, guildId, rawMessageId, message);
+    }
+}
+
+public static class StringUtil
+{
+    public static string? UncommaNumbers(string? str)
+    {
+        if (str == null || str.Length <= 2) return str;
+        StringBuilder b = new StringBuilder(str.Length);
+        b.Append(str[0]);
+        for (int i = 1; i < str.Length - 1; i++)
+        {
+            if (str[i] == ',' &&
+                str[i - 1] >= '0' && str[i - 1] <= '9' &&
+                str[i + 1] >= '0' && str[i + 1] <= '9')
+            {
+                // skip
+            }
+            else
+            {
+                b.Append(str[i]);
+            }
+        }
+
+        b.Append(str[^1]);
+        return b.ToString();
     }
 }
