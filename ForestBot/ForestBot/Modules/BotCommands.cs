@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
+using System.Net;
 using System.Text;
 using Discord;
 using Discord.Interactions;
@@ -7,6 +9,7 @@ using ForestLib;
 using ForestLib.AgeSettings.Ages;
 using ForestLib.Database;
 using ForestLib.Tools;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace ForestBot.Modules;
 
@@ -33,38 +36,54 @@ public class BotCommands : InteractionModuleBase<SocketInteractionContext>
     public async Task Echo(string echo, [Summary(description: "mention the user")] bool mention = false)
         => await RespondAsync(echo + (mention ? Context.User.Mention : string.Empty));
 
+    private static MessageProcessor? _processor;
+    
     [SlashCommand("process-messages", "Reads messages from another channel")]
     public async Task ProcessMessage(string channel, int lookback = 100, int numMessages = 0, string? startFromMessageId = null)
     {
+        if (_processor != null && !_processor.IsDone())
+        {
+            await RespondAsync("Existing processor is still running: " + _processor);
+            return;
+        }
+
         SocketTextChannel? chan = Context.Guild.TextChannels.FirstOrDefault(c => c.Name.ToLower() == channel);
         if (chan == null)
         {
             await RespondAsync($"Unable to find channel [{channel}]");
             return;
         }
-        IEnumerable<IMessage> messages;
-        if (startFromMessageId == null)
+
+        ulong? startMessage = null;
+        ulong? endMessage = null;
+        if (startFromMessageId != null)
         {
-            messages = await chan.GetMessagesAsync(lookback).FlattenAsync();
-        }
-        else
-        {
-            messages = await chan.GetMessagesAsync(ulong.Parse(startFromMessageId), Direction.Before, lookback).FlattenAsync();
-        }
-        MessageHandler handler = new MessageHandler();
-        if (numMessages == 0) numMessages = int.MaxValue;
-        int processed = 0, saved = 0;
-        ulong? minMessage = null;
-        foreach (IMessage m in messages)
-        {
-            saved += await handler.MessageReceivedEvent(m);
-            processed++;
-            numMessages--;
-            if (minMessage == null || minMessage.Value > m.Id) minMessage = m.Id;
-            if (numMessages <= 0) break;
+            string[] parts = startFromMessageId.Split('-');
+            if (parts.Length == 1)
+            {
+                startMessage = ulong.Parse(startFromMessageId);
+            }
+            else
+            {
+                startMessage = ulong.Parse(parts[0]);
+                endMessage = ulong.Parse(parts[1]);
+                if (startMessage < endMessage)
+                {
+                    (startMessage, endMessage) = (endMessage, startMessage);
+                }
+            }
         }
 
-        await RespondAsync($"Processed {processed} messages, added {saved} to the DB. Min message was {minMessage}");
+        if (_processor != null && _processor.MaxMessages == numMessages && _processor.StartFromMessageId == startMessage && _processor.EndMessageId == endMessage)
+        {
+            await RespondAsync((_processor.IsDone() ? "Completed: " : "Running:: ") + _processor);
+            return;
+        }
+
+        _processor = new MessageProcessor(chan, startMessage, endMessage, numMessages);
+        _processor.Start();
+
+        await RespondAsync($"Started new processor: " + _processor);
     }
 
     [SlashCommand("read-messages", "Reads messages from another channel")]
